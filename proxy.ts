@@ -1,9 +1,11 @@
 /**
- * Clerk middleware. Protects every route by default; explicit allowlist for
- * marketing, sign-in/up, and webhooks.
+ * Next.js 16 Proxy (was `middleware.ts` pre-16). Protects every route by
+ * default with an explicit allowlist for marketing, auth, webhooks, jobs,
+ * and the Sentry tunnel.
  *
- * Webhook routes MUST be public (Clerk + Stripe sign their own bodies) and MUST
- * not parse user identity here — they verify via signing keys inside the route.
+ * Runs on Node.js runtime by default in Next 16, which is required because
+ * Clerk pulls in Node-only deps (#crypto, @clerk/shared/*) that Edge can't
+ * resolve.
  */
 
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
@@ -25,9 +27,6 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 export const config = {
-  // Run on Node runtime so Clerk's Node-only deps resolve.
-  // Requires experimental.nodeMiddleware: true in next.config.ts.
-  runtime: 'nodejs',
   matcher: [
     // Skip Next internals + static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
