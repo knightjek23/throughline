@@ -3,8 +3,14 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
   // Strict mode catches more bugs at dev time; cheap insurance.
-  // Note: instrumentation.ts is enabled by default in Next 15 — no flag needed.
+  // Note: instrumentation.ts is enabled by default in Next 15+, no flag needed.
   reactStrictMode: true,
+  experimental: {
+    // Run middleware on Node runtime instead of Edge.
+    // Clerk pulls in Node-only modules (#crypto, @clerk/shared/*) that
+    // Edge can't resolve, so we opt the middleware into Node here.
+    nodeMiddleware: true,
+  },
 };
 
 export default withSentryConfig(nextConfig, {

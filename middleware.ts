@@ -14,7 +14,8 @@ const isPublic = createRouteMatcher([
   '/sign-up(.*)',
   '/api/health',
   '/api/webhooks/(.*)',
-  '/api/jobs/(.*)', // QStash targets — they verify their own signatures
+  '/api/jobs/(.*)', // QStash targets, they verify their own signatures
+  '/monitoring(.*)', // Sentry tunnelRoute, must bypass auth
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -24,6 +25,9 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 export const config = {
+  // Run on Node runtime so Clerk's Node-only deps resolve.
+  // Requires experimental.nodeMiddleware: true in next.config.ts.
+  runtime: 'nodejs',
   matcher: [
     // Skip Next internals + static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
