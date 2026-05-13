@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/**
+ * Throughline design tokens — Editorial Research palette.
+ * Base: Future Neutrals (Cloud Dancer + Ink + Slate UI).
+ * Accent: Muted Terracotta — warmer than the typical SaaS blue.
+ * Locked to light mode for v1.
+ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  /* Foundation surfaces */
+  --color-bg-base: #F0EEE9;        /* Cloud Dancer — main background */
+  --color-bg-surface: #FAF8F3;     /* Cards, raised surfaces */
+  --color-bg-subtle: #E8E5DC;      /* Input fills, dividers */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Text */
+  --color-text-primary: #2C2C2A;   /* Ink */
+  --color-text-secondary: #78766F; /* Slate UI */
+  --color-text-tertiary: #B0ADAA;  /* Mist */
+
+  /* Accent — use sparingly for CTAs, theme chips, active states */
+  --color-accent: #C47A5A;         /* Muted Terracotta */
+  --color-accent-hover: #A86245;
+  --color-accent-soft: #F4E3D8;    /* Badge / chip backgrounds */
+
+  /* Semantic */
+  --color-success: #6B8E5E;        /* Analyzed status */
+  --color-warning: #C4960A;        /* Trial expiry, plan limits */
+  --color-error: #B84A3A;
+
+  /* Borders */
+  --color-border-subtle: rgba(44, 44, 42, 0.08);
+  --color-border-default: rgba(44, 44, 42, 0.14);
+  --color-border-strong: rgba(44, 44, 42, 0.24);
+
+  /* Typography — see app/layout.tsx for next/font imports */
+  --font-display: var(--font-instrument-serif), Charter, Georgia, serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection color picks up the accent so quote highlighting feels native. */
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-text-primary);
 }
