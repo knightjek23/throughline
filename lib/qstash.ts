@@ -2,32 +2,76 @@
  * QStash wrapper. Routes enqueue jobs through this; QStash hits target routes
  * which run inside Vercel functions configured for up to 800s (Vercel Pro).
  *
- * Job targets verify the request signature with `verifySignature()` before
- * doing any work. Never trust an unsigned request.
+ * Local dev fallback: in development, calling QStash cloud doesn't work
+ * because it can't reach localhost. So in dev we invoke the target route
+ * directly via fetch with a bypass header. Production uses real QStash.
+ *
+ * Job targets verify the request signature with `verifyJobRequest()` before
+ * doing any work. Never trust an unsigned request in production.
  */
 
 import 'server-only';
 import { Client, Receiver } from '@upstash/qstash';
+import { logger } from './logger';
 
-const client = new Client({ token: process.env.QSTASH_TOKEN! });
+const isDev = process.env.NEXT_PUBLIC_APP_ENV === 'development';
 
-const receiver = new Receiver({
-  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
-  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
-});
+// Lazy clients so missing env vars don't blow up module load in dev.
+let cachedClient: Client | null = null;
+let cachedReceiver: Receiver | null = null;
+
+function getClient(): Client {
+  if (cachedClient) return cachedClient;
+  cachedClient = new Client({ token: process.env.QSTASH_TOKEN! });
+  return cachedClient;
+}
+
+function getReceiver(): Receiver {
+  if (cachedReceiver) return cachedReceiver;
+  cachedReceiver = new Receiver({
+    currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
+    nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
+  });
+  return cachedReceiver;
+}
 
 export type JobName = 'analyze-interview' | 'synthesize-study';
 
 export interface EnqueueArgs<T> {
   job: JobName;
   payload: T;
-  // Defer execution — useful for debouncing aggregate synthesis.
+  /** Defer execution. Useful for debouncing aggregate synthesis. */
   delaySeconds?: number;
 }
 
+/**
+ * Header the dev fallback sets so the target route can accept the call
+ * without a real QStash signature. Production routes still require a real
+ * signature; the bypass is checked only when NEXT_PUBLIC_APP_ENV === 'development'.
+ */
+export const DEV_BYPASS_HEADER = 'x-throughline-dev-bypass';
+
 export async function enqueue<T>({ job, payload, delaySeconds }: EnqueueArgs<T>) {
   const targetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/jobs/${job}`;
-  return client.publishJSON({
+
+  if (isDev) {
+    // Fire and forget. The target route runs in the same dev server process.
+    // We don't await it so the upload response can return immediately, just
+    // like production where QStash returns after enqueuing.
+    void fetch(targetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [DEV_BYPASS_HEADER]: '1',
+      },
+      body: JSON.stringify(payload),
+    }).catch((err) => {
+      logger.error({ err, job }, 'dev qstash fallback fetch failed');
+    });
+    return { messageId: `dev-${Date.now()}` };
+  }
+
+  return getClient().publishJSON({
     url: targetUrl,
     body: payload,
     delay: delaySeconds,
@@ -35,12 +79,22 @@ export async function enqueue<T>({ job, payload, delaySeconds }: EnqueueArgs<T>)
   });
 }
 
+/**
+ * Verifies a request is from QStash (or, in dev, carries the bypass header).
+ * Returns true only when the request can be trusted.
+ */
 export async function verifyJobRequest(req: Request): Promise<boolean> {
+  // Dev bypass: skip signature verification when running locally.
+  if (isDev && req.headers.get(DEV_BYPASS_HEADER) === '1') {
+    return true;
+  }
+
   const signature = req.headers.get('upstash-signature');
   if (!signature) return false;
+
   const body = await req.clone().text();
   try {
-    return await receiver.verify({ signature, body });
+    return await getReceiver().verify({ signature, body });
   } catch {
     return false;
   }
