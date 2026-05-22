@@ -74,7 +74,7 @@ export default async function StudyDetailPage({ params }: PageProps) {
       </section>
 
       <p className="mt-16 font-mono text-xs text-[var(--color-text-tertiary)]">
-        Day 2 placeholder. Interview detail pages + cross-interview themes ship Day 4–5.
+        Day 2 placeholder. Interview detail pages and cross-interview themes ship Day 4 to 5.
       </p>
     </main>
   );

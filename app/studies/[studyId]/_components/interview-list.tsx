@@ -104,7 +104,8 @@ export function InterviewList({ studyId, initial }: Props) {
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium text-[var(--color-text-primary)]">{row.filename}</p>
             <p className="mt-0.5 font-mono text-xs text-[var(--color-text-tertiary)]">
-              {row.word_count?.toLocaleString() ?? '—'} words · uploaded {relativeTime(row.uploaded_at)}
+              {row.word_count != null ? `${row.word_count.toLocaleString()} words · ` : ''}
+              uploaded {relativeTime(row.uploaded_at)}
               {row.status === 'failed' && row.failure_reason ? ` · ${row.failure_reason}` : ''}
             </p>
           </div>

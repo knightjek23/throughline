@@ -24,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Throughline — research synthesis for solo PMs and UX researchers',
+  title: 'Throughline. Research synthesis for solo PMs and UX researchers.',
   description:
     'Upload interview transcripts. Get themes, quotes, and cross-study synthesis. $19/mo.',
 };
