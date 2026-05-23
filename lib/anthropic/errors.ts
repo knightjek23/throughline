@@ -16,3 +16,16 @@ export class ApiRetryExhaustedError extends Error {
     this.name = 'ApiRetryExhaustedError';
   }
 }
+
+/**
+ * Thrown when the transcript exceeds the 40k-token soft ceiling (estimated
+ * via a word-count heuristic, not the real BPE tokenizer). The message is
+ * the user-facing failure_reason copy directly, so the job handler can
+ * surface `err.message` without remapping.
+ */
+export class TooLongError extends Error {
+  constructor() {
+    super('Transcript too long. Max 40k tokens, about 30k words.');
+    this.name = 'TooLongError';
+  }
+}
