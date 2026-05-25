@@ -29,3 +29,17 @@ export class TooLongError extends Error {
     this.name = 'TooLongError';
   }
 }
+
+/**
+ * Thrown when quote substring validation drops every quote and every theme
+ * loses its grounding. Means the model hallucinated the entire response,
+ * or returned themes with quote.theme values that don't match any theme.
+ * Either way, the analysis is unusable; better to fail loud and let the
+ * user retry than ship an empty result.
+ */
+export class NoGroundedThemesError extends Error {
+  constructor() {
+    super('Analysis returned no grounded themes.');
+    this.name = 'NoGroundedThemesError';
+  }
+}
