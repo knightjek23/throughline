@@ -22,6 +22,8 @@ CRITICAL RULES:
 
 5. Summary: 2 to 4 sentences describing what the participant talked about and the overall tenor of the conversation.
 
+6. STYLE: Never use em dashes or en dashes in the summary, theme names, theme descriptions, or quote.theme references. Pick the punctuation that matches the function instead: colon for list intros or punchlines, period for hard breaks, commas or parentheses for asides, the word "to" for number ranges. This rule applies to all generated content. The ONLY exception is quote.text, which must remain a verbatim substring of the transcript regardless of which punctuation the transcript contains.
+
 Call the tool exactly once. Do not produce any text outside the tool call.`;
 
 export const SYNTHESIZE_SYSTEM_PROMPT = `You synthesize cross-interview themes. (Day 5: drop in v0 prompt here.)`;

@@ -36,6 +36,22 @@ describe('ANALYZE_SYSTEM_PROMPT', () => {
     expect(ANALYZE_SYSTEM_PROMPT).not.toContain('drop in v0 prompt');
     expect(ANALYZE_SYSTEM_PROMPT).not.toContain('TODO');
   });
+
+  it('forbids em dashes in generated content', () => {
+    expect(ANALYZE_SYSTEM_PROMPT.toLowerCase()).toMatch(/em dash|em-dash/);
+  });
+
+  it('exempts verbatim quotes from the em-dash rule', () => {
+    // The prompt must call out that quotes are excluded, otherwise the model
+    // might mangle a transcript that legitimately contains em dashes.
+    expect(ANALYZE_SYSTEM_PROMPT.toLowerCase()).toMatch(
+      /quote.*verbatim|verbatim.*quote|exact substring/,
+    );
+  });
+
+  it('does not itself contain em or en dashes', () => {
+    expect(ANALYZE_SYSTEM_PROMPT).not.toMatch(/[—–]/);
+  });
 });
 
 describe('buildUserMessage()', () => {

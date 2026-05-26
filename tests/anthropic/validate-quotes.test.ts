@@ -128,6 +128,83 @@ describe('validateAndPrune — theme pruning', () => {
   });
 });
 
+describe('validateAndPrune — em/en dash stripping', () => {
+  it('strips em dashes from the summary', () => {
+    const transcript = 'real content here that exists in transcript';
+    const analysis = makeAnalysis({
+      summary:
+        'Participant talked about their job — it was very fragmented and exhausting at times.',
+      themes: [{ name: 'Theme A', description: 'Description for theme A that meets length.' }],
+      quotes: [{ text: 'real content', theme: 'Theme A', char_start: 0, char_end: 12 }],
+    });
+    const { cleaned } = validateAndPrune(analysis, transcript);
+    expect(cleaned.summary).not.toMatch(/[—–]/);
+  });
+
+  it('strips em dashes from theme name and description', () => {
+    const transcript = 'real content here that exists in transcript';
+    const analysis = makeAnalysis({
+      themes: [
+        {
+          name: 'Tool fatigue — burnout',
+          description: 'They are tired — really tired — of new tools every quarter.',
+        },
+      ],
+      quotes: [
+        { text: 'real content', theme: 'Tool fatigue — burnout', char_start: 0, char_end: 12 },
+      ],
+    });
+    const { cleaned } = validateAndPrune(analysis, transcript);
+    expect(cleaned.themes[0].name).not.toMatch(/[—–]/);
+    expect(cleaned.themes[0].description).not.toMatch(/[—–]/);
+  });
+
+  it('keeps quote.theme matching theme.name after stripping both', () => {
+    // quote.theme is stripped symmetrically so the membership check still
+    // succeeds; otherwise quotes would orphan after normalization.
+    const transcript = 'real content here that exists in transcript';
+    const analysis = makeAnalysis({
+      themes: [
+        {
+          name: 'Pricing — barriers',
+          description: 'Cost shows up unprompted as a blocker on tool adoption.',
+        },
+      ],
+      quotes: [
+        {
+          text: 'real content',
+          theme: 'Pricing — barriers',
+          char_start: 0,
+          char_end: 12,
+        },
+      ],
+    });
+    const { cleaned, droppedQuotes, droppedThemes } = validateAndPrune(analysis, transcript);
+    expect(droppedQuotes).toBe(0);
+    expect(droppedThemes).toBe(0);
+    expect(cleaned.themes[0].name).toBe(cleaned.quotes[0].theme);
+  });
+
+  it('preserves em dashes in quote.text (must stay verbatim from transcript)', () => {
+    const transcript = 'I said something — and then they laughed loudly at it.';
+    const analysis = makeAnalysis({
+      themes: [
+        { name: 'Theme A', description: 'Description for theme A that meets length.' },
+      ],
+      quotes: [
+        {
+          text: 'I said something — and then they laughed',
+          theme: 'Theme A',
+          char_start: 0,
+          char_end: 40,
+        },
+      ],
+    });
+    const { cleaned } = validateAndPrune(analysis, transcript);
+    expect(cleaned.quotes[0].text).toContain('—');
+  });
+});
+
 describe('validateAndPrune — total failure', () => {
   it('throws NoGroundedThemesError when all themes orphan', () => {
     const transcript = 'real transcript content here only';
