@@ -8,13 +8,14 @@
  *                       ↘
  *                          failed (failure_reason set)
  *
- * Day 2: uses the `analyzeInterview` stub. Day 3 swaps in the real Anthropic
- * call. The route shape stays identical so Day 3 is a one-file change.
+ * Day 3 calls the real Anthropic analyzer. Failures are mapped to
+ * user-facing failure_reason strings via lib/anthropic/failure-reason.
  */
 
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { analyzeInterview } from '@/lib/anthropic/analyze';
+import { failureReason } from '@/lib/anthropic/failure-reason';
 import { verifyJobRequest } from '@/lib/qstash';
 import { track } from '@/lib/posthog';
 import { jsonOk, jsonError } from '@/lib/api/responses';
@@ -22,8 +23,8 @@ import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-// Vercel Pro lets functions run up to 800s. Day 3 transcripts can take up
-// to ~60s with Anthropic; Day 2 stub sleeps 8s. 300s is comfortably bounded.
+// Vercel Pro lets functions run up to 800s. Day 3 transcripts take up
+// to ~60s with Anthropic; 300s is comfortably bounded.
 export const maxDuration = 300;
 
 const payloadSchema = z.object({
@@ -31,10 +32,6 @@ const payloadSchema = z.object({
   userId: z.string().min(1),
   studyId: z.string().uuid(),
 });
-
-// Day 2: simulate analysis latency so the UI status transitions are visible.
-// Day 3 removes this once we have a real Anthropic call.
-const STUB_LATENCY_MS = 8000;
 
 export async function POST(req: Request) {
   // Signature gate. In production this rejects everything that isn't QStash.
@@ -92,9 +89,6 @@ export async function POST(req: Request) {
     .maybeSingle();
 
   try {
-    // Day 2 stub latency. Day 3 removes this sleep.
-    await new Promise((r) => setTimeout(r, STUB_LATENCY_MS));
-
     const result = await analyzeInterview({
       interviewId,
       transcript: interview.transcript_text,
@@ -126,15 +120,22 @@ export async function POST(req: Request) {
       .update({ status: 'analyzed', analyzed_at: new Date().toISOString(), failure_reason: null })
       .eq('id', interviewId);
 
-    void track('interview_analyzed', userId, { interviewId, studyId, droppedQuotes: result.droppedQuotes });
+    void track('interview_analyzed', userId, {
+      interviewId,
+      studyId,
+      droppedQuotes: result.droppedQuotes,
+      droppedThemes: result.droppedThemes,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+    });
     logger.info({ interviewId, studyId, userId }, 'interview analyzed');
     return jsonOk({ ok: true, interviewId });
   } catch (err) {
-    const reason = err instanceof Error ? err.message : 'unknown error';
+    const reason = failureReason(err);
     logger.error({ err, interviewId }, 'analyze failed');
     await markFailed(interviewId, reason);
     void track('interview_failed', userId, { interviewId, studyId, reason });
-    // Return 200 so QStash doesn't retry — we've already recorded the failure.
+    // Return 200 so QStash doesn't retry. We've already recorded the failure.
     return jsonOk({ ok: false, interviewId, reason });
   }
 }
