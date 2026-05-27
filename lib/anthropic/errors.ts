@@ -43,3 +43,17 @@ export class NoGroundedThemesError extends Error {
     this.name = 'NoGroundedThemesError';
   }
 }
+
+/**
+ * Thrown when Anthropic returned a response we can't parse:
+ *  - No `tool_use` block in the content (model produced text only)
+ *  - tool_use.input doesn't satisfy interviewAnalysisSchema
+ * Either case means the model broke its contract; retry won't help since
+ * temperature is 0 and the same prompt will produce the same broken shape.
+ */
+export class InvalidAnalysisFormatError extends Error {
+  constructor() {
+    super('Analysis returned invalid format.');
+    this.name = 'InvalidAnalysisFormatError';
+  }
+}
