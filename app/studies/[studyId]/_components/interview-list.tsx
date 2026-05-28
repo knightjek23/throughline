@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 export type InterviewStatus = 'queued' | 'processing' | 'analyzed' | 'failed';
 
@@ -100,20 +101,27 @@ export function InterviewList({ studyId, initial }: Props) {
   return (
     <ul className="divide-y divide-[var(--color-border-subtle)] rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
       {rows.map((row) => (
-        <li key={row.id} className="flex items-center justify-between gap-4 px-5 py-4">
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-medium text-[var(--color-text-primary)]">{row.filename}</p>
-            <p className="mt-0.5 font-mono text-xs text-[var(--color-text-tertiary)]">
-              {row.word_count != null ? `${row.word_count.toLocaleString()} words · ` : ''}
-              uploaded {relativeTime(row.uploaded_at)}
-              {row.status === 'failed' && row.failure_reason ? ` · ${row.failure_reason}` : ''}
-            </p>
-          </div>
-          <span
-            className={`shrink-0 rounded-full px-3 py-1 font-mono text-xs font-medium uppercase tracking-wide ${STATUS_STYLE[row.status]}`}
+        <li key={row.id}>
+          <Link
+            href={`/studies/${studyId}/interviews/${row.id}`}
+            className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--color-bg-subtle)]"
           >
-            {STATUS_LABEL[row.status]}
-          </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium text-[var(--color-text-primary)]">
+                {row.filename}
+              </p>
+              <p className="mt-0.5 font-mono text-xs text-[var(--color-text-tertiary)]">
+                {row.word_count != null ? `${row.word_count.toLocaleString()} words · ` : ''}
+                uploaded {relativeTime(row.uploaded_at)}
+                {row.status === 'failed' && row.failure_reason ? ` · ${row.failure_reason}` : ''}
+              </p>
+            </div>
+            <span
+              className={`shrink-0 rounded-full px-3 py-1 font-mono text-xs font-medium uppercase tracking-wide ${STATUS_STYLE[row.status]}`}
+            >
+              {STATUS_LABEL[row.status]}
+            </span>
+          </Link>
         </li>
       ))}
     </ul>

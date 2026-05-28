@@ -1,0 +1,65 @@
+Interviewer: Thanks for making time today. To start, can you walk me through what your week looks like in terms of research work?
+
+Participant: Sure. So I'm the only UX researcher at my company, we're like a forty-person startup. My week is honestly pretty fragmented. Mondays I usually have one or two recruiting calls, where I'm screening participants for whatever study is active that week. Tuesdays and Wednesdays I'm doing actual interviews, usually four or five, sometimes six. Thursdays I block off for what I call synthesis, but it never actually happens on Thursdays. And Fridays are just chaos. Standups, reviews, Slack messages, whatever leadership needs me to put together for the next leadership offsite.
+
+Interviewer: Got it. So when does the synthesis actually happen?
+
+Participant: Honestly, on weekends. Or late at night. Which I know is a bad answer. I've been doing it for two years and it has not gotten better. Every week I tell myself this week I'll get the synthesis done during the workday, and every week it just slips. The interviews are the easy part. The interviews are fun. The synthesis is what kills me.
+
+Interviewer: When you say synthesis kills you, what specifically?
+
+Participant: It's the gap between having thirty pages of notes and having one slide that I can put in front of the head of product. That gap is where I spend ninety percent of my mental energy, and it's also where I add ninety percent of the value, in theory. But I never feel like I've done it well. Every time I show up to a readout I'm convinced I missed something important and I'm working from a partial picture.
+
+Interviewer: What does your synthesis workflow actually look like? Walk me through it.
+
+Participant: OK so the embarrassing answer is, I have a Google Doc per study. I tried Dovetail, like everyone tries Dovetail. I got through about three studies in Dovetail and then I just stopped opening it. The tagging system, the projects, the boards, I just could not maintain it. So now I have a Google Doc called "Q2 onboarding study" or whatever, and I paste in raw transcripts, and then I have a separate Google Doc called "Q2 onboarding synthesis" and I write themes in there as I go. It's not a system. It's a coping mechanism.
+
+Interviewer: What was hard about Dovetail specifically?
+
+Participant: The setup tax. Every new study, I had to recreate the tagging taxonomy, decide on a structure, set up the highlights. By the time I'd done all that I had spent two hours and I hadn't actually started thinking yet. And the worst part is, I'd come back two weeks later, look at my tag tree, and have no memory of why I'd made those particular tags. So I'd retag everything. It just felt like I was doing arts and crafts instead of research.
+
+Interviewer: That's interesting. Have you tried other tools?
+
+Participant: I've tried, let me think. Notion. Airtable. There was a brief Reflect period. Aurelius, way back. Condens. I think I have an open trial in EnjoyHQ right now that I forgot to cancel. Every tool starts with a beautiful empty canvas and ends with me feeling stupid for not maintaining it. At some point I realized the issue is me, not the tools. I want a tool that does the synthesis FOR me. Not a tool that lets me synthesize more cleanly.
+
+Interviewer: Tell me more about that. What would "doing the synthesis for you" look like?
+
+Participant: OK so when I come out of an interview, the thing in my head is, what did this person teach me that I didn't know before. That's the only useful unit. Not tags, not codes, not highlights. Just, what did I learn. If a tool could just give me that paragraph, automatically, I would pay for it. I would pay a lot for it. And then after three interviews, I want the cross-cutting themes. What did all three of these people say that overlaps. That's the second unit. Themes across interviews.
+
+Interviewer: How are you doing that today?
+
+Participant: I read all my transcripts and try to hold them in my head, which doesn't scale. After about four interviews I start losing track of who said what. I've started using Claude actually. I'll paste a transcript in and ask it to summarize. It's pretty good for one interview. But I can't load multiple interviews at once and ask for themes across them, the context window isn't big enough, or I just don't trust it to keep them separate. So I do the cross-cutting synthesis manually, by hand, in a Google Doc. And it takes forever.
+
+Interviewer: When you've used Claude for single-interview summaries, what's worked and what hasn't?
+
+Participant: What works is the speed. I get a draft in fifteen seconds that's pretty close to what I'd have written. What doesn't work is, I never quite trust the quotes. I'll ask for quotes and it'll give me something that sounds plausible but I'm never sure it's verbatim. So I end up going back to the transcript and checking. Which means I've done the work twice. I want a synthesis tool where I know every quote is real. If I can't trust the quotes I can't trust the themes.
+
+Interviewer: That's a really specific pain point. Have you found anything that handles that well?
+
+Participant: No. I mean honestly that's why I'm on this call. I saw you were building something in this space. I've been waiting for a Dovetail-but-for-actual-humans for like three years. I don't need collaboration features, I'm the only researcher. I don't need a billion integrations. I just need themes and quotes I can trust, from one interview or three or ten. And I need it cheap because my company won't approve a hundred-dollar-a-month seat for one person.
+
+Interviewer: What's the budget look like for tools right now?
+
+Participant: I get to expense up to like fifty dollars a month without asking anyone. Above that I have to write a justification. Above a hundred and fifty it has to go to the CFO. Honestly I'd just pay for it out of pocket if it actually worked. Like, I would put nineteen dollars a month on my personal card no problem if it saved me four hours a week.
+
+Interviewer: Switching topics for a second. What's the worst research project you've ever done and why?
+
+Participant: Oh god. OK there's two answers. The slow disaster was a quant survey we ran last year, where I was supposed to validate something that leadership had already decided. The data came back, the data said the opposite of what they wanted, and the whole thing got buried. I spent six weeks on it. The fast disaster was a week where I had to do eight user interviews in five days, write the synthesis, present it to the board, all while my partner was traveling and I was solo-parenting our two-year-old. I was running interviews from the playground.
+
+Interviewer: That's brutal.
+
+Participant: It was brutal. And actually the takeaway from that week was kind of interesting. I realized that the limiting factor in my work is not skill or methodology, it's energy. I can do good research when I'm rested. I can't when I'm not. And no tool is going to fix that. But a tool that takes the rote parts off my plate, the transcribing, the tagging, the first-pass synthesis, that gives me back the energy for the parts that actually need a human brain.
+
+Interviewer: That's a great framing. What about the social side? Solo research can be isolating, I imagine.
+
+Participant: Oh yeah. That's the part nobody talks about. I love my job but I have nobody to talk to about the work itself. There's no other researcher at my company. The PMs care about the conclusions but they don't care about the craft. So when I have a finding that I'm not sure about, or when I'm wrestling with a methodology question, I have nobody to spitball with. I've started using Claude for that too. I'll tell it about a finding and ask whether it sounds robust. Which is bizarre to admit. But it's better than nothing.
+
+Interviewer: That's not bizarre. A lot of solo researchers I talk to say the same thing. Last question. If you woke up tomorrow and synthesis was magically solved, what would you do with that time?
+
+Participant: I'd do more interviews. Honestly that's it. The whole reason I cut my interview count is because synthesis is the bottleneck. If I could do thirty interviews a quarter instead of fifteen, my company would have twice as much customer insight, my recommendations would be twice as confident, and I'd probably get promoted. The thing holding me back from being a better researcher is not interview skill. It's that the post-interview work eats my soul.
+
+Interviewer: That's helpful. Anything else you want to share before we wrap up?
+
+Participant: Just that whoever solves this is going to make a lot of money from people like me. There's a real population of solo researchers and indie PMs who can't justify Dovetail's pricing but who do real research every week. And we're underserved. So good luck. I hope it's you.
+
+Interviewer: Thanks. I'll let you know when we have something to show.
