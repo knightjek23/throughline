@@ -23,6 +23,7 @@
 
 import type { InterviewAnalysis } from './schemas';
 import { NoGroundedThemesError } from './errors';
+import { stripEmDashes } from './text-normalize';
 
 export interface ValidateResult {
   cleaned: InterviewAnalysis;
@@ -31,27 +32,6 @@ export interface ValidateResult {
 }
 
 type Quote = InterviewAnalysis['quotes'][number];
-
-/**
- * Strips em and en dashes from generated text so the analysis surface
- * never reads as AI-generated. Applied to summary, theme.name,
- * theme.description, and quote.theme (the reference, not quote.text
- * which must stay verbatim).
- *
- * Number ranges become "X to Y". Everything else collapses to a comma,
- * which is approximate but always grammatically valid. The model is
- * also instructed in the system prompt not to produce these in the
- * first place; this is the belt-and-suspenders pass.
- */
-function stripEmDashes(text: string): string {
-  return text
-    .replace(/(\d)\s*[—–]\s*(\d)/g, '$1 to $2')
-    .replace(/\s*[—–]\s*/g, ', ')
-    .replace(/\s+--\s+/g, ', ')
-    .replace(/,\s*,/g, ',')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 export function validateAndPrune(
   analysis: InterviewAnalysis,
