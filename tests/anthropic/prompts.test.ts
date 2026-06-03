@@ -9,7 +9,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ANALYZE_SYSTEM_PROMPT, buildUserMessage } from '@/lib/anthropic/prompts';
+import {
+  ANALYZE_SYSTEM_PROMPT,
+  buildUserMessage,
+  SYNTHESIZE_SYSTEM_PROMPT,
+  buildSynthesizeUserMessage,
+  type SynthesizeInterview,
+} from '@/lib/anthropic/prompts';
 
 describe('ANALYZE_SYSTEM_PROMPT', () => {
   it('is a non-trivial prompt', () => {
@@ -128,5 +134,95 @@ describe('buildUserMessage()', () => {
     expect(labelIdx).toBeGreaterThanOrEqual(0);
     expect(transcriptIdx).toBeGreaterThan(rqIdx);
     expect(transcriptIdx).toBeGreaterThan(labelIdx);
+  });
+});
+
+describe('SYNTHESIZE_SYSTEM_PROMPT', () => {
+  it('is a non-trivial prompt', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT.length).toBeGreaterThan(200);
+  });
+
+  it('references the synthesize tool by name', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT).toContain('record_study_synthesis');
+  });
+
+  it('mentions deduplication across interviews', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT.toLowerCase()).toMatch(/dedup|merge|collaps|same thing/);
+  });
+
+  it('mentions frequency', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT.toLowerCase()).toContain('frequency');
+  });
+
+  it('mentions source_theme_refs back to per-interview themes', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT).toMatch(/source_theme_refs|reference.*back|point.*back/i);
+  });
+
+  it('forbids em dashes in generated content', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT.toLowerCase()).toMatch(/em dash|em-dash/);
+  });
+
+  it('does not itself contain em or en dashes', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT).not.toMatch(/[—–]/);
+  });
+
+  it('does not contain placeholder text', () => {
+    expect(SYNTHESIZE_SYSTEM_PROMPT).not.toContain('drop in v0 prompt');
+    expect(SYNTHESIZE_SYSTEM_PROMPT).not.toContain('TODO');
+  });
+});
+
+describe('buildSynthesizeUserMessage', () => {
+  const I1: SynthesizeInterview = {
+    interview_id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    themes: [
+      { name: 'Synthesis bottleneck', description: 'Post-interview write-up was the chokepoint.' },
+      { name: 'Tool fatigue', description: 'Tired of evaluating another platform every quarter.' },
+    ],
+    sentiment: 'mixed',
+    summary: 'Solo researcher described synthesis as the limiting factor in weekly throughput.',
+  };
+  const I2: SynthesizeInterview = {
+    interview_id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    themes: [
+      { name: 'Synthesis is hard', description: 'Cannot keep findings straight across interviews.' },
+    ],
+    sentiment: 'negative',
+    summary: 'Researcher at a different company described similar pain around cross-interview themes.',
+  };
+
+  it('includes every interview_id', () => {
+    const msg = buildSynthesizeUserMessage([I1, I2]);
+    expect(msg).toContain(I1.interview_id);
+    expect(msg).toContain(I2.interview_id);
+  });
+
+  it('includes every theme name and description', () => {
+    const msg = buildSynthesizeUserMessage([I1, I2]);
+    expect(msg).toContain('Synthesis bottleneck');
+    expect(msg).toContain('Post-interview write-up was the chokepoint.');
+    expect(msg).toContain('Tool fatigue');
+    expect(msg).toContain('Synthesis is hard');
+  });
+
+  it('includes sentiment and summary for each interview', () => {
+    const msg = buildSynthesizeUserMessage([I1, I2]);
+    expect(msg).toContain('mixed');
+    expect(msg).toContain('negative');
+    expect(msg).toContain(I1.summary);
+    expect(msg).toContain(I2.summary);
+  });
+
+  it('is deterministic regardless of input order', () => {
+    const msg1 = buildSynthesizeUserMessage([I1, I2]);
+    const msg2 = buildSynthesizeUserMessage([I2, I1]);
+    expect(msg1).toBe(msg2);
+  });
+
+  it('does not invent quote text from the input themes', () => {
+    // SynthesizeInterview has no quotes field on purpose. The builder must
+    // not synthesize fake quotes from descriptions or summaries.
+    const msg = buildSynthesizeUserMessage([I1, I2]);
+    expect(msg.toLowerCase()).not.toContain('quote:');
   });
 });
