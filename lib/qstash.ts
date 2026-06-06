@@ -42,6 +42,12 @@ export interface EnqueueArgs<T> {
   payload: T;
   /** Defer execution. Useful for debouncing aggregate synthesis. */
   delaySeconds?: number;
+  /**
+   * Coalesces concurrent enqueues with the same ID. QStash side-effect:
+   * within the dedup window, only the first enqueue is delivered; later
+   * enqueues with the same ID get the same messageId and no extra call.
+   */
+  deduplicationId?: string;
 }
 
 /**
@@ -51,13 +57,19 @@ export interface EnqueueArgs<T> {
  */
 export const DEV_BYPASS_HEADER = 'x-throughline-dev-bypass';
 
-export async function enqueue<T>({ job, payload, delaySeconds }: EnqueueArgs<T>) {
+export async function enqueue<T>({
+  job,
+  payload,
+  delaySeconds,
+  deduplicationId,
+}: EnqueueArgs<T>) {
   const targetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/jobs/${job}`;
 
   if (isDev) {
     // Fire and forget. The target route runs in the same dev server process.
     // We don't await it so the upload response can return immediately, just
-    // like production where QStash returns after enqueuing.
+    // like production where QStash returns after enqueuing. Dev skips dedup;
+    // the clobber risk is low and the DB upsert is last-write-wins.
     void fetch(targetUrl, {
       method: 'POST',
       headers: {
@@ -75,7 +87,21 @@ export async function enqueue<T>({ job, payload, delaySeconds }: EnqueueArgs<T>)
     url: targetUrl,
     body: payload,
     delay: delaySeconds,
+    deduplicationId,
     retries: 2,
+  });
+}
+
+/**
+ * Convenience wrapper for the aggregate synthesis job. Uses `studyId` as
+ * the dedup key so a burst of analyze completions on the same study only
+ * triggers one synthesis call.
+ */
+export async function enqueueSynthesizeStudy(studyId: string, userId: string) {
+  return enqueue({
+    job: 'synthesize-study',
+    payload: { studyId, userId },
+    deduplicationId: studyId,
   });
 }
 
