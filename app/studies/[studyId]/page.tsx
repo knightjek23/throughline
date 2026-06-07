@@ -1,8 +1,9 @@
 /**
- * /studies/[studyId] — study detail page.
- * Day 2 surface: study name + research question, upload form, interview list
- * with polling-based status updates. Day 5 adds tabs (Interviews | Aggregate),
- * interview detail pages, and theme editing.
+ * /studies/[studyId] - study detail page with Interviews and Aggregate tabs.
+ *
+ * Day 4: ships the tabbed layout. Aggregate tab reads from study_themes.
+ * Tabs are URL-driven via `?tab=` so each is deep-linkable and the page
+ * only fetches the data it needs to render the active tab.
  */
 
 import { notFound } from 'next/navigation';
@@ -11,15 +12,24 @@ import { ensureUser } from '@/lib/users';
 import { createServerClient } from '@/lib/supabase/server';
 import { UploadForm } from './_components/upload-form';
 import { InterviewList, type InterviewRow } from './_components/interview-list';
+import { TabBar, type StudyTab } from './_components/tab-bar';
+import { AggregateThemes } from './_components/aggregate-themes';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ studyId: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function StudyDetailPage({ params }: PageProps) {
+function parseTab(raw: string | undefined): StudyTab {
+  return raw === 'aggregate' ? 'aggregate' : 'interviews';
+}
+
+export default async function StudyDetailPage({ params, searchParams }: PageProps) {
   const { studyId } = await params;
+  const { tab } = await searchParams;
+  const activeTab = parseTab(tab);
   await ensureUser();
 
   const supabase = await createServerClient();
@@ -34,13 +44,23 @@ export default async function StudyDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const { data: interviewsData } = await supabase
-    .from('interviews')
-    .select('id, filename, status, word_count, uploaded_at, analyzed_at, failure_reason')
-    .eq('study_id', studyId)
-    .order('uploaded_at', { ascending: false });
+  // Always fetch interview list + aggregate count so the tab bar can show
+  // counts on both tabs regardless of which one is active. The full
+  // aggregate theme rows only get fetched when the Aggregate tab renders.
+  const [interviewsResult, aggregateCountResult] = await Promise.all([
+    supabase
+      .from('interviews')
+      .select('id, filename, status, word_count, uploaded_at, analyzed_at, failure_reason')
+      .eq('study_id', studyId)
+      .order('uploaded_at', { ascending: false }),
+    supabase
+      .from('study_themes')
+      .select('id', { count: 'exact', head: true })
+      .eq('study_id', studyId),
+  ]);
 
-  const interviews: InterviewRow[] = (interviewsData ?? []) as InterviewRow[];
+  const interviews: InterviewRow[] = (interviewsResult.data ?? []) as InterviewRow[];
+  const aggregateThemeCount = aggregateCountResult.count ?? 0;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -60,22 +80,26 @@ export default async function StudyDetailPage({ params }: PageProps) {
         </p>
       )}
 
-      <div className="mt-10">
-        <UploadForm studyId={study.id} />
-      </div>
+      <TabBar
+        studyId={study.id}
+        activeTab={activeTab}
+        interviewCount={interviews.length}
+        aggregateThemeCount={aggregateThemeCount}
+      />
 
-      <section className="mt-12">
-        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-          Interviews
-        </h2>
-        <div className="mt-4">
-          <InterviewList studyId={study.id} initial={interviews} />
-        </div>
-      </section>
+      {activeTab === 'interviews' ? (
+        <>
+          <div className="mt-10">
+            <UploadForm studyId={study.id} />
+          </div>
 
-      <p className="mt-16 font-mono text-xs text-[var(--color-text-tertiary)]">
-        Day 2 placeholder. Interview detail pages and cross-interview themes ship Day 4 to 5.
-      </p>
+          <section className="mt-10">
+            <InterviewList studyId={study.id} initial={interviews} />
+          </section>
+        </>
+      ) : (
+        <AggregateThemes studyId={study.id} />
+      )}
     </main>
   );
 }
