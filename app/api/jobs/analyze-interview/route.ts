@@ -16,10 +16,12 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { analyzeInterview } from '@/lib/anthropic/analyze';
 import { failureReason } from '@/lib/anthropic/failure-reason';
-import { verifyJobRequest } from '@/lib/qstash';
+import { verifyJobRequest, enqueueSynthesizeStudy } from '@/lib/qstash';
 import { track } from '@/lib/posthog';
 import { jsonOk, jsonError } from '@/lib/api/responses';
 import { logger } from '@/lib/logger';
+
+const SYNTHESIS_TRIGGER_THRESHOLD = 3;
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -119,6 +121,28 @@ export async function POST(req: Request) {
       .from('interviews')
       .update({ status: 'analyzed', analyzed_at: new Date().toISOString(), failure_reason: null })
       .eq('id', interviewId);
+
+    // Trigger cross-study synthesis once this study has 3+ analyzed
+    // interviews. Wrapped so an enqueue failure (transient QStash hiccup,
+    // missing env var on prod, etc.) does not unwind the analyze result.
+    // QStash dedup on studyId collapses burst enqueues.
+    try {
+      const { count: analyzedCount } = await supabase
+        .from('interviews')
+        .select('id', { count: 'exact', head: true })
+        .eq('study_id', studyId)
+        .eq('status', 'analyzed');
+
+      if ((analyzedCount ?? 0) >= SYNTHESIS_TRIGGER_THRESHOLD) {
+        await enqueueSynthesizeStudy(studyId, userId);
+        logger.info({ studyId, analyzedCount }, 'aggregate synthesis enqueued');
+      }
+    } catch (synthErr) {
+      logger.warn(
+        { err: synthErr, studyId },
+        'failed to enqueue synthesize-study (analyze still succeeded)',
+      );
+    }
 
     void track('interview_analyzed', userId, {
       interviewId,
