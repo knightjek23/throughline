@@ -1,0 +1,59 @@
+Interviewer: Thanks for taking the time. Can you give me a sense of what your week looks like when you're doing customer research?
+
+Participant: Yeah so honestly there is no separate "research week." I'm a solo founder. I do everything. Last week I shipped a feature, fielded twelve support tickets, ran four user interviews, did one sales call, and recorded a demo video. The interviews happen in between everything else. I do not have a research practice. I have a survival practice.
+
+Interviewer: Walk me through how you handle the data after an interview.
+
+Participant: I take notes during the call. Otter transcribes it too. After the call I have like fifteen minutes before the next thing, so I jot down two or three takeaways at the top of the transcript in a Google Doc and then move on. The actual synthesis, which is the part that matters, that happens... I want to say "never" but it does happen sometimes, usually when I'm trying to write a PRD and I realize I have no idea what users actually said three weeks ago.
+
+Interviewer: So synthesis is something you do to support shipping decisions, not as its own deliverable.
+
+Participant: Exactly. The output of research for me is "what should we build next." If I cannot answer that question, the research did not happen. And honestly the bottleneck is not collecting the data, the bottleneck is digesting it. I have like sixty hours of interview recordings sitting in a folder right now. I have not listened to most of them.
+
+Interviewer: How have you tried to solve that?
+
+Participant: I built a spreadsheet. Of course. It has columns for participant, date, top three takeaways, and quote. I fill it in for maybe a third of the interviews. The other two thirds just live in transcripts. I tried using Dovetail for a week and bounced. Their pricing alone, I mean it is more than I pay for my entire SaaS stack combined for one feature I would barely use.
+
+Interviewer: What would you actually pay for?
+
+Participant: I would pay for a thing that took my transcript and gave me three bullet points. Not tags. Not a tag tree. Three bullets. "Here is what this person said, here is what they want, here is one thing that surprised them." If that thing existed for twenty bucks a month I would buy it today.
+
+Interviewer: And for cross-interview synthesis?
+
+Participant: Even more valuable. If I could upload ten transcripts and get back "here are the four things that came up across these," that would change how I work. Right now I cannot do that, so I just trust my gut and write PRDs based on whatever the loudest user said last week. Which is bad. I know it is bad.
+
+Interviewer: Have you used any AI tools for this?
+
+Participant: ChatGPT and Claude both. I paste a transcript in, ask for a summary, it works fine. But I cannot fit ten transcripts in. And honestly the summaries feel generic, like the model is not really reading the interview, it is just pattern matching on "this is what a research summary looks like." When I ask for quotes, sometimes the quotes are made up. That broke trust pretty hard.
+
+Interviewer: Yeah, the hallucinated quote problem comes up a lot.
+
+Participant: It is the dealbreaker honestly. If I cannot trust the quotes I cannot use the synthesis to defend a decision to the team. Like I want to be able to say "three users said the same thing about onboarding" and link to the actual transcript line. If the AI made it up, I look stupid.
+
+Interviewer: How do you make decisions today, given that synthesis is broken?
+
+Participant: I cheat. I have favorite users. There are like five people I talk to often who I trust to represent the broader user base. When I need to make a call I message them. It is bad methodology but it is fast and the signal is real. The actual interviews I do, most of them just sit unused.
+
+Interviewer: What would have to be true for you to actually rely on a synthesis tool?
+
+Participant: Three things. One, quotes have to be real and linkable back to the transcript. Two, it has to be usable in under five minutes without setup. No tags, no projects, no taxonomies. Drop a file in, get an output. Three, it has to handle multiple interviews together. The single-interview summary is nice but the real value is the cross-cut.
+
+Interviewer: What about pricing? If it did all that, what would you actually pay?
+
+Participant: For a solo founder doing maybe ten interviews a month? Twenty to thirty bucks. Maybe forty if it was really good. The Dovetail pricing is insane. Eighty nine dollars a seat assumes you have a research team. I am the team.
+
+Interviewer: Switching gears. Tell me about a time research actually changed a decision you made.
+
+Participant: One time. I was about to build a complicated permissions system. Then I did five interviews and four of the five people said they did not care about permissions at all, they just wanted to share a link. I killed the feature and saved myself two weeks. That is the only time I can name where research clearly redirected me. Everything else, I sort of think the research influenced me but I cannot prove it.
+
+Interviewer: What about the times research has not changed your mind, even when it probably should have?
+
+Participant: Oh god. Lots. I have a strong opinion about how onboarding should work and I have done interviews where users push back on my approach and I just sort of nod and go back to my opinion. That is on me. But also, if synthesis took less effort, I would do more of it, and the cumulative weight of evidence would probably overcome my biases faster.
+
+Interviewer: That is a really honest answer. Last one. If you could wave a wand and have one synthesis-related thing solved, what would it be?
+
+Participant: Real quotes linked back to the actual transcript moment. That alone unlocks everything else for me. If I trust the input I can build everything else on top.
+
+Interviewer: Helpful. Thanks for the time.
+
+Participant: Thanks. Send me when you launch.

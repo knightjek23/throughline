@@ -1,0 +1,55 @@
+Interviewer: Thanks for jumping on. Can you give me a sense of how research fits into your role?
+
+Participant: Sure. So I am a senior PM at a B2B SaaS company, about a hundred and fifty people. I am not a researcher, but I do research as part of my job. Maybe one study a quarter. Eight to twelve interviews per study. The rest of the time I am writing PRDs, running standups, doing roadmap planning, all the usual PM stuff.
+
+Interviewer: How did you get started doing research?
+
+Participant: Out of necessity. We do not have a dedicated researcher. The design team has one but she is booked out three quarters in advance. So if I need to validate a feature direction or understand a customer segment, I have to do it myself. I took the Maven course from Teresa Torres a couple years ago, that is my baseline.
+
+Interviewer: When you do a study, walk me through how you handle the analysis side.
+
+Participant: It is messy. I record the interviews on Gong. The transcripts are decent. After all the interviews are done I block off two days on my calendar and try to synthesize. By "synthesize" I mean I open all the transcripts in tabs, read through them, and write a Google Doc with what I think the patterns are. It takes way longer than two days and the output is never as good as I want it to be.
+
+Interviewer: What does "not as good as you want" look like?
+
+Participant: I feel like I am cherry-picking. I will write a finding like "users want X" and I am not sure if that is because three people said X or because the one person who said X said it really memorably. The good researchers I know have systems for actually counting and weighting. I do not. I just sort of vibe-synthesize. And then when I present to stakeholders, someone always asks "how many people said that" and I have to make up a number.
+
+Interviewer: Have you tried any tools to help with the counting?
+
+Participant: I tried Dovetail twice. The first time I quit because the setup was too much. The second time I made it through one study and used the tagging system, and you know what, it was actually pretty helpful once I had everything tagged. But I never opened it again after that study because I knew the next study would start with two hours of setting up a new tag tree and I just could not.
+
+Interviewer: So Dovetail worked, kind of.
+
+Participant: It worked when I committed to it. But it required commitment I cannot sustain across studies that happen once a quarter. The tag tree from study one is not relevant to study three, so the muscle memory does not carry. Every study is starting from scratch.
+
+Interviewer: That is interesting. The infrequency of your research actually makes it harder to maintain a system.
+
+Participant: Yeah exactly. If I did research every week I would build the habit. Doing it every three months means I forget how the tool works between sessions. The tool ends up working against me because it assumes I am a full-time researcher with a stable taxonomy. I am not.
+
+Interviewer: Have you tried AI for this?
+
+Participant: I use Claude a lot for other PM work. Writing, summarizing reports, that kind of thing. For research synthesis specifically I have tried it a couple times. The output is good but I am skeptical. Like, it gives me five themes and they sound right, but how do I know it is not just reflecting my prompt back to me? And the quotes it gives, I have caught it making up quotes that sound like things people would have said but were not actually said. That is enough for me to not use it for anything I would defend in a stakeholder meeting.
+
+Interviewer: So the hallucinated quotes are the trust killer.
+
+Participant: For sure. If I cannot defend the input to a critical PM or eng lead, the whole thing is useless. The most common pushback I get on research findings is "where did this come from" and I need a real answer.
+
+Interviewer: Let me ask about stakeholders. How does the rest of the company engage with your research?
+
+Participant: Mostly they ignore it until it confirms what they already wanted to do. Or they pick out one quote that supports their hypothesis and use it to justify a decision. The rigor is just not there. I am as guilty of this as anyone. I have written research summaries where I knew which conclusion I wanted to land on before I started reading the transcripts.
+
+Interviewer: That is candid. What would help with that bias?
+
+Participant: A tool that actually showed me the evidence in a way I cannot easily ignore. Like, "here are the three themes, each one has these five quotes from these participants." That would make it harder for me to silently overweight the one user who agreed with me. The current process is too forgiving of confirmation bias.
+
+Interviewer: If a tool existed that did synthesis the way you want, what would you pay?
+
+Participant: My company would pay whatever. Probably more than Dovetail charges. But the practical answer is, I would probably pay for it personally first to validate it works for me, then expense it. Personal price tolerance is maybe forty dollars a month. Anything higher feels like I am moonlighting as a researcher when I am supposed to be a PM.
+
+Interviewer: Anything else you want to share?
+
+Participant: Just that the cross-interview synthesis is the magic for me. I do not need a tool to summarize one interview, I can do that in my head. I need a tool to tell me what came up across ten interviews. That is the part that is genuinely hard and where my brain hits its limit.
+
+Interviewer: That is a really useful framing. Thanks for the time.
+
+Participant: Of course. Good luck with this.
