@@ -1,35 +1,27 @@
 /**
- * POST /api/jobs/synthesize-study
+ * POST /api/studies/[studyId]/synthesize
  *
- * QStash target. Runs cross-study aggregate synthesis: pulls every
- * analyzed interview's analysis, dedups themes across them, and upserts
- * the result into `study_themes`. Triggered from analyze-interview/route
- * after each upload past the 3rd reaches `status='analyzed'`.
+ * User-triggered aggregate cross-study synthesis. Replaces the auto-trigger
+ * approach (removed Day 4) with an explicit CTA on the Aggregate tab.
  *
- * Idempotent: `study_themes` is UNIQUE on study_id. Reruns replace the
- * previous synthesis row. Failures are logged + tracked in PostHog but
- * do not write to a failure column (v1 surfaces failures only via logs).
+ * Synchronous: this route awaits the Anthropic call and the DB writes
+ * before returning. With Sonnet 4.6 + 3 to 25 interviews, typical wall
+ * clock is 30 to 60 seconds, well within Vercel Pro's 300s function cap.
+ * Client shows a spinner during the wait and refreshes on success.
  */
 
-import { z } from 'zod';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { auth } from '@clerk/nextjs/server';
+import { createServerClient } from '@/lib/supabase/server';
+import { ensureUser } from '@/lib/users';
 import { synthesizeStudy, type SynthesizeStudyInterview } from '@/lib/anthropic/synthesize';
-import { verifyJobRequest } from '@/lib/qstash';
 import { failureReason } from '@/lib/anthropic/failure-reason';
+import { jsonOk, jsonError, jsonUnauthorized } from '@/lib/api/responses';
 import { track } from '@/lib/posthog';
-import { jsonOk, jsonError } from '@/lib/api/responses';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-// Typical synthesis call on Sonnet 4.6 for 3 to 25 interviews runs ~10 to 30s.
-// 300s is the same comfortable upper bound used by analyze-interview.
 export const maxDuration = 300;
-
-const payloadSchema = z.object({
-  studyId: z.string().uuid(),
-  userId: z.string().min(1),
-});
 
 const MIN_INTERVIEWS = 3;
 
@@ -53,27 +45,29 @@ interface RawAnalysisJoin {
     | null;
 }
 
-export async function POST(req: Request) {
-  const isValid = await verifyJobRequest(req);
-  if (!isValid) {
-    logger.warn('synthesize-study: rejected unsigned request');
-    return jsonError('unauthorized', 401);
+export async function POST(
+  _req: Request,
+  context: { params: Promise<{ studyId: string }> },
+) {
+  const { studyId } = await context.params;
+  const { userId } = await auth();
+  if (!userId) return jsonUnauthorized();
+
+  await ensureUser();
+  const supabase = await createServerClient();
+
+  // RLS scopes this to the authenticated user. If they don't own the
+  // study, the select returns no row and we 404.
+  const { data: study } = await supabase
+    .from('studies')
+    .select('id')
+    .eq('id', studyId)
+    .maybeSingle();
+
+  if (!study) {
+    return jsonError('study not found', 404);
   }
 
-  let payload: z.infer<typeof payloadSchema>;
-  try {
-    const body = await req.json();
-    payload = payloadSchema.parse(body);
-  } catch (err) {
-    logger.warn({ err }, 'synthesize-study: malformed payload');
-    // 200 so QStash doesn't retry a permanently bad payload.
-    return jsonOk({ skipped: 'invalid_payload' });
-  }
-
-  const { studyId, userId } = payload;
-  const supabase = createAdminClient();
-
-  // Pull analyzed interviews + their analyses in a single join.
   const { data: rows, error: fetchErr } = await supabase
     .from('interviews')
     .select(
@@ -92,11 +86,9 @@ export async function POST(req: Request) {
 
   if (fetchErr) {
     logger.error({ err: fetchErr, studyId }, 'failed to fetch analyses');
-    return jsonError('db error', 500);
+    return jsonError('failed to load analyses', 500);
   }
 
-  // Build SynthesizeStudyInterview[]. The join may return interview_analyses
-  // as a single object (1:1 FK) or an array; handle both for safety.
   const interviews: SynthesizeStudyInterview[] = (rows ?? [])
     .map((row: RawAnalysisJoin) => {
       const ia = Array.isArray(row.interview_analyses)
@@ -123,20 +115,16 @@ export async function POST(req: Request) {
     .filter((iv): iv is SynthesizeStudyInterview => iv !== null);
 
   if (interviews.length < MIN_INTERVIEWS) {
-    logger.info(
-      { studyId, count: interviews.length },
-      'synthesize-study: too few analyzed interviews, skipping',
+    return jsonError(
+      `Need at least ${MIN_INTERVIEWS} analyzed interviews. You have ${interviews.length}.`,
+      400,
     );
-    return jsonOk({ skipped: 'too_few_interviews', count: interviews.length });
   }
 
   try {
     const result = await synthesizeStudy({ interviews });
 
-    // `study_themes` is one row per aggregate theme, not one row per study.
-    // Strategy: clear prior aggregate rows for this study, then insert the
-    // fresh batch. v1.1 will preserve user_edited=true rows when theme
-    // editing ships; for v1 no editing UI exists so blanket delete is safe.
+    // Clear prior aggregate rows for this study and insert the fresh batch.
     const { error: deleteErr } = await supabase
       .from('study_themes')
       .delete()
@@ -168,12 +156,10 @@ export async function POST(req: Request) {
       { studyId, userId, themeCount: result.themes.length, interviewCount: interviews.length },
       'study synthesized',
     );
-    return jsonOk({ ok: true, studyId, themeCount: result.themes.length });
+    return jsonOk({ ok: true, themeCount: result.themes.length });
   } catch (err) {
     const reason = failureReason(err);
     logger.error({ err, studyId, reason }, 'synthesis failed');
-    void track('aggregate_synthesized', userId, { studyId, error: reason });
-    // 200 so QStash doesn't retry. We've already logged + tracked.
-    return jsonOk({ ok: false, studyId, reason });
+    return jsonError(reason, 500);
   }
 }

@@ -149,10 +149,12 @@ export async function synthesizeStudy(
   if (!toolUse) {
     logger.warn(
       {
-        blockTypes: blocks.map((b) => (typeof b === 'object' && b !== null ? (b as { type?: string }).type : 'unknown')),
-        toolNames: blocks
-          .filter((b): b is ToolUseBlock => isToolUseBlock(b))
-          .map((b) => b.name),
+        blockTypes: (blocks as unknown[]).map((b) =>
+          typeof b === 'object' && b !== null ? ((b as { type?: string }).type ?? 'unknown') : 'unknown',
+        ),
+        toolNames: (blocks as unknown[])
+          .filter((b) => typeof b === 'object' && b !== null && (b as { type?: string }).type === 'tool_use')
+          .map((b) => (b as { name?: string }).name ?? 'unnamed'),
       },
       'synthesize-study: response had no record_study_synthesis tool_use block',
     );

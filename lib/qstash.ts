@@ -35,7 +35,7 @@ function getReceiver(): Receiver {
   return cachedReceiver;
 }
 
-export type JobName = 'analyze-interview' | 'synthesize-study';
+export type JobName = 'analyze-interview';
 
 export interface EnqueueArgs<T> {
   job: JobName;
@@ -89,19 +89,6 @@ export async function enqueue<T>({
     delay: delaySeconds,
     deduplicationId,
     retries: 2,
-  });
-}
-
-/**
- * Convenience wrapper for the aggregate synthesis job. Uses `studyId` as
- * the dedup key so a burst of analyze completions on the same study only
- * triggers one synthesis call.
- */
-export async function enqueueSynthesizeStudy(studyId: string, userId: string) {
-  return enqueue({
-    job: 'synthesize-study',
-    payload: { studyId, userId },
-    deduplicationId: studyId,
   });
 }
 

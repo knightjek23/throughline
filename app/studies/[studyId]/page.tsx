@@ -61,6 +61,7 @@ export default async function StudyDetailPage({ params, searchParams }: PageProp
 
   const interviews: InterviewRow[] = (interviewsResult.data ?? []) as InterviewRow[];
   const aggregateThemeCount = aggregateCountResult.count ?? 0;
+  const analyzedInterviewCount = interviews.filter((iv) => iv.status === 'analyzed').length;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -98,7 +99,10 @@ export default async function StudyDetailPage({ params, searchParams }: PageProp
           </section>
         </>
       ) : (
-        <AggregateThemes studyId={study.id} />
+        <AggregateThemes
+          studyId={study.id}
+          analyzedInterviewCount={analyzedInterviewCount}
+        />
       )}
     </main>
   );

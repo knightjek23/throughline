@@ -79,8 +79,21 @@ Sonnet 4.6 at $3 per MTok in, $15 per MTok out. A typical 10k-token transcript r
 
 - Chunking for >40k token transcripts (v1.1)
 - Retry button in UI (Day 4 or v1.1)
-- Interview detail page rendering analysis (Day 4)
 - Aggregate cross-study synthesis (Day 5)
 - Prompt caching and other Anthropic cost optimizations (v2)
 - Streaming analysis to client (v2)
 - Multi-language transcript support (v1 cut)
+
+## Dogfood result (2026-06-02)
+
+Hypothesis: rated 3+/5 across the three criteria.
+
+**Actual:** 3 to 3.5 across all three (usefulness, grounding, RQ-bias-without-narrowing). Passes the bar but barely. The analysis is functional and ships, with prompt tuning queued as a v1.0 follow-up. Real-transcript dogfood will tell us whether the gap is the synthetic fixture or the prompt itself.
+
+**What landed beyond original spec:** the read-only interview detail page (originally scoped for Day 4) was pulled forward so dogfood could happen in the actual UI instead of the SQL editor. A no-em-dash rule was added to both the system prompt and a post-process pass in `validate-quotes.ts` after the first dogfood revealed em dashes in generated content; see [[feedback-no-em-dash]].
+
+**Known follow-ups:**
+
+- Detail page does not auto-poll while interview is in queued or processing state. User has to refresh the page manually. Small polish for Day 4.
+- Prompt could surface more specific theme names. Generic-leaning at 3/5 usefulness suggests room for sharpening.
+- The 1 to 2 surprising off-RQ theme allowance may need stronger encouragement in the prompt.

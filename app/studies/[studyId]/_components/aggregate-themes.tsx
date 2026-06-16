@@ -8,12 +8,16 @@
  */
 
 import { createServerClient } from '@/lib/supabase/server';
+import { SynthesizeCTA } from './synthesize-cta';
+
+const MIN_INTERVIEWS_FOR_SYNTHESIS = 3;
 
 interface Props {
   studyId: string;
+  analyzedInterviewCount: number;
 }
 
-export async function AggregateThemes({ studyId }: Props) {
+export async function AggregateThemes({ studyId, analyzedInterviewCount }: Props) {
   const supabase = await createServerClient();
 
   const { data: themes } = await supabase
@@ -26,15 +30,11 @@ export async function AggregateThemes({ studyId }: Props) {
 
   if (rows.length === 0) {
     return (
-      <section className="mt-10 rounded-lg border border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg-surface)] p-8">
-        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-          No aggregate yet
-        </h2>
-        <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
-          Cross-interview themes appear here after three interviews finish analysis. Upload one
-          more and Throughline will dedup themes across the study automatically.
-        </p>
-      </section>
+      <SynthesizeCTA
+        studyId={studyId}
+        analyzedInterviewCount={analyzedInterviewCount}
+        minInterviews={MIN_INTERVIEWS_FOR_SYNTHESIS}
+      />
     );
   }
 
@@ -72,7 +72,7 @@ export async function AggregateThemes({ studyId }: Props) {
       </ul>
 
       <p className="mt-10 font-mono text-xs text-[var(--color-text-tertiary)]">
-        Tap to drill into source quotes per theme ships next.
+        Re-synthesize after uploading more interviews. Drill-down to source quotes ships next.
       </p>
     </section>
   );
