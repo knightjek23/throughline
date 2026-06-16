@@ -37,6 +37,7 @@ import {
 } from './prompts';
 import { stripEmDashes } from './text-normalize';
 import { InvalidAnalysisFormatError, NoGroundedThemesError } from './errors';
+import { logger } from '../logger';
 
 const MAX_OUTPUT_TOKENS = 4096;
 const TEMPERATURE = 0;
@@ -146,12 +147,28 @@ export async function synthesizeStudy(
     (b) => isToolUseBlock(b) && b.name === recordStudySynthesisTool.name,
   ) as ToolUseBlock | undefined;
   if (!toolUse) {
+    logger.warn(
+      {
+        blockTypes: blocks.map((b) => (typeof b === 'object' && b !== null ? (b as { type?: string }).type : 'unknown')),
+        toolNames: blocks
+          .filter((b): b is ToolUseBlock => isToolUseBlock(b))
+          .map((b) => b.name),
+      },
+      'synthesize-study: response had no record_study_synthesis tool_use block',
+    );
     throw new InvalidAnalysisFormatError();
   }
 
   // 4. Validate the tool output shape.
   const parsed = toolOutputSchema.safeParse(toolUse.input);
   if (!parsed.success) {
+    logger.warn(
+      {
+        issues: parsed.error.issues,
+        modelInput: toolUse.input,
+      },
+      'synthesize-study: tool input failed Zod validation',
+    );
     throw new InvalidAnalysisFormatError();
   }
 
