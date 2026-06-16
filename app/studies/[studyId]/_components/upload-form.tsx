@@ -71,10 +71,8 @@ export function UploadForm({ studyId }: Props) {
 
   return (
     <div className="rounded-lg border border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg-surface)] p-6">
-      <h2 className="font-display text-xl tracking-tight text-[var(--color-text-primary)]">
-        Upload a transcript
-      </h2>
-      <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+      <h2 className="t-display-3 text-[var(--color-text-primary)]">Upload a transcript</h2>
+      <p className="t-body-m mt-1 text-[var(--color-text-secondary)]">
         Plain text only for now. We&apos;ll queue it for analysis and surface themes and quotes
         within ~10 seconds.
       </p>
@@ -86,15 +84,15 @@ export function UploadForm({ studyId }: Props) {
           accept={ACCEPT}
           disabled={submitting}
           onChange={(e) => handleFiles(e.target.files)}
-          className="block max-w-md cursor-pointer text-sm text-[var(--color-text-secondary)] file:mr-4 file:rounded-md file:border-0 file:bg-[var(--color-accent)] file:px-4 file:py-2 file:font-medium file:text-[var(--color-bg-base)] file:transition-colors hover:file:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="t-body-m block max-w-md cursor-pointer text-[var(--color-text-secondary)] file:mr-4 file:rounded-md file:border-0 file:bg-[var(--color-accent)] file:px-4 file:py-2 file:text-[var(--color-bg-base)] file:transition-colors hover:file:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
         />
         {submitting && (
-          <span className="font-mono text-xs text-[var(--color-text-secondary)]">Uploading…</span>
+          <span className="t-code text-[var(--color-text-secondary)]">Uploading…</span>
         )}
       </div>
 
       {error && (
-        <p className="mt-3 text-sm text-[var(--color-error)]" role="alert">
+        <p className="t-body-m mt-3 text-[var(--color-error)]" role="alert">
           {error}
         </p>
       )}

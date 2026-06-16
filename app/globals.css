@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 /**
- * Throughline design tokens — Editorial Research palette.
- * Base: Future Neutrals (Cloud Dancer + Ink + Slate UI).
- * Accent: Muted Terracotta — warmer than the typical SaaS blue.
+ * Throughline design tokens.
+ * Colors: Editorial Research palette (Cloud Dancer + Muted Terracotta accent).
+ * Type: Text Hierarchy v1.0 (Lora display + Inter UI + Geist Mono code).
  * Locked to light mode for v1.
  */
 
 @theme {
   /* Foundation surfaces */
-  --color-bg-base: #F0EEE9;        /* Cloud Dancer — main background */
+  --color-bg-base: #F0EEE9;        /* Cloud Dancer, main background */
   --color-bg-surface: #FAF8F3;     /* Cards, raised surfaces */
   --color-bg-subtle: #E8E5DC;      /* Input fills, dividers */
 
@@ -18,7 +18,7 @@
   --color-text-secondary: #78766F; /* Slate UI */
   --color-text-tertiary: #B0ADAA;  /* Mist */
 
-  /* Accent — use sparingly for CTAs, theme chips, active states */
+  /* Accent for CTAs, theme chips, active states */
   --color-accent: #C47A5A;         /* Muted Terracotta */
   --color-accent-hover: #A86245;
   --color-accent-soft: #F4E3D8;    /* Badge / chip backgrounds */
@@ -33,10 +33,10 @@
   --color-border-default: rgba(44, 44, 42, 0.14);
   --color-border-strong: rgba(44, 44, 42, 0.24);
 
-  /* Typography — see app/layout.tsx for next/font imports */
-  --font-display: var(--font-instrument-serif), Charter, Georgia, serif;
+  /* Font families. Concrete next/font vars get injected on <html> in layout.tsx. */
+  --font-display: var(--font-lora), Charter, Georgia, serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+  --font-mono: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
 }
 
 body {
@@ -51,4 +51,89 @@ body {
 ::selection {
   background: var(--color-accent-soft);
   color: var(--color-text-primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * Text Hierarchy utility classes — see docs/Text-Hierarchy.pdf.
+ * Naming: `.t-<role>`. Apply on any element; size + line-height + family +
+ * weight + casing/spacing/italics come bundled. Color stays the element's
+ * responsibility so it inherits or gets set via existing color tokens.
+ * ------------------------------------------------------------------------- */
+
+.t-display-1 {
+  font-family: var(--font-display);
+  font-size: 35px;
+  line-height: 47px;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.t-display-number {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 48px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.t-display-2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.t-display-3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.t-subhead {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 300;
+}
+
+.t-body-l {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+}
+
+.t-body-m {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.t-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.t-italic-stat {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.t-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 400;
+  font-variant-ligatures: none;
 }

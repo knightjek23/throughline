@@ -31,13 +31,9 @@ export default async function StudiesPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-        Throughline
-      </p>
-      <h1 className="mt-6 font-display text-4xl tracking-tight text-[var(--color-text-primary)]">
-        Studies
-      </h1>
-      <p className="mt-3 text-[var(--color-text-secondary)]">
+      <p className="t-eyebrow text-[var(--color-text-secondary)]">Throughline</p>
+      <h1 className="t-display-1 mt-6 text-[var(--color-text-primary)]">Studies</h1>
+      <p className="t-subhead mt-3 text-[var(--color-text-secondary)]">
         A study is a single research project. Drop interview transcripts inside and Throughline
         surfaces themes and quotes across them.
       </p>
@@ -47,12 +43,10 @@ export default async function StudiesPage() {
       </div>
 
       <section className="mt-12">
-        <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-          Your studies
-        </h2>
+        <h2 className="t-eyebrow text-[var(--color-text-secondary)]">Your studies</h2>
 
         {list.length === 0 ? (
-          <p className="mt-4 text-sm text-[var(--color-text-tertiary)]">
+          <p className="t-body-m mt-4 text-[var(--color-text-tertiary)]">
             No studies yet. Create one above to get started.
           </p>
         ) : (
@@ -64,18 +58,18 @@ export default async function StudiesPage() {
                   className="flex items-baseline justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--color-bg-subtle)]"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-display text-lg text-[var(--color-text-primary)]">
+                    <p className="t-display-3 truncate text-[var(--color-text-primary)]">
                       {study.name}
                     </p>
                     {study.research_question && (
-                      <p className="mt-1 truncate text-sm text-[var(--color-text-secondary)]">
+                      <p className="t-body-m mt-1 truncate text-[var(--color-text-secondary)]">
                         {study.research_question}
                       </p>
                     )}
                   </div>
                   <time
                     dateTime={study.created_at}
-                    className="shrink-0 font-mono text-xs text-[var(--color-text-tertiary)]"
+                    className="t-code shrink-0 text-[var(--color-text-tertiary)]"
                   >
                     {new Date(study.created_at).toLocaleDateString()}
                   </time>

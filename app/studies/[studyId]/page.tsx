@@ -67,16 +67,14 @@ export default async function StudyDetailPage({ params, searchParams }: PageProp
     <main className="mx-auto max-w-3xl px-6 py-16">
       <Link
         href="/studies"
-        className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+        className="t-eyebrow text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
       >
         ← Studies
       </Link>
 
-      <h1 className="mt-4 font-display text-4xl tracking-tight text-[var(--color-text-primary)]">
-        {study.name}
-      </h1>
+      <h1 className="t-display-1 mt-4 text-[var(--color-text-primary)]">{study.name}</h1>
       {study.research_question && (
-        <p className="mt-3 max-w-2xl text-lg text-[var(--color-text-secondary)]">
+        <p className="t-subhead mt-3 max-w-2xl text-[var(--color-text-secondary)]">
           {study.research_question}
         </p>
       )}

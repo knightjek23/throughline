@@ -42,7 +42,7 @@ export function TabBar({ studyId, activeTab, interviewCount, aggregateThemeCount
           <Link
             key={tab.key}
             href={href}
-            className={`-mb-px flex items-baseline gap-2 border-b-2 pb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] transition-colors ${
+            className={`t-eyebrow -mb-px flex items-baseline gap-2 border-b-2 pb-3 transition-colors ${
               isActive
                 ? 'border-[var(--color-accent)] text-[var(--color-text-primary)]'
                 : 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
@@ -51,7 +51,7 @@ export function TabBar({ studyId, activeTab, interviewCount, aggregateThemeCount
             {tab.label}
             {tab.count > 0 ? (
               <span
-                className={`font-mono text-xs ${
+                className={`t-code ${
                   isActive
                     ? 'text-[var(--color-accent)]'
                     : 'text-[var(--color-text-tertiary)]'

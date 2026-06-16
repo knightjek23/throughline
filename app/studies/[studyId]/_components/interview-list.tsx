@@ -92,7 +92,7 @@ export function InterviewList({ studyId, initial }: Props) {
 
   if (rows.length === 0) {
     return (
-      <p className="text-sm text-[var(--color-text-tertiary)]">
+      <p className="t-body-m text-[var(--color-text-tertiary)]">
         No interviews yet. Upload one above to see themes and quotes.
       </p>
     );
@@ -107,17 +107,15 @@ export function InterviewList({ studyId, initial }: Props) {
             className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--color-bg-subtle)]"
           >
             <div className="min-w-0 flex-1">
-              <p className="truncate font-medium text-[var(--color-text-primary)]">
-                {row.filename}
-              </p>
-              <p className="mt-0.5 font-mono text-xs text-[var(--color-text-tertiary)]">
+              <p className="t-body-l truncate text-[var(--color-text-primary)]">{row.filename}</p>
+              <p className="t-code mt-0.5 text-[var(--color-text-tertiary)]">
                 {row.word_count != null ? `${row.word_count.toLocaleString()} words · ` : ''}
                 uploaded {relativeTime(row.uploaded_at)}
                 {row.status === 'failed' && row.failure_reason ? ` · ${row.failure_reason}` : ''}
               </p>
             </div>
             <span
-              className={`shrink-0 rounded-full px-3 py-1 font-mono text-xs font-medium uppercase tracking-wide ${STATUS_STYLE[row.status]}`}
+              className={`t-eyebrow shrink-0 rounded-full px-3 py-1 ${STATUS_STYLE[row.status]}`}
             >
               {STATUS_LABEL[row.status]}
             </span>

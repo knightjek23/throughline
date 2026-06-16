@@ -92,16 +92,14 @@ export default async function InterviewDetailPage({ params }: PageProps) {
     <main className="mx-auto max-w-3xl px-6 py-16">
       <Link
         href={`/studies/${studyId}`}
-        className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+        className="t-eyebrow text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
       >
         ← Study
       </Link>
 
-      <h1 className="mt-4 font-display text-3xl tracking-tight text-[var(--color-text-primary)]">
-        {interview.filename}
-      </h1>
+      <h1 className="t-display-1 mt-4 text-[var(--color-text-primary)]">{interview.filename}</h1>
 
-      <p className="mt-3 font-mono text-xs text-[var(--color-text-tertiary)]">
+      <p className="t-code mt-3 text-[var(--color-text-tertiary)]">
         {interview.word_count != null ? `${interview.word_count.toLocaleString()} words · ` : ''}
         uploaded {relativeTime(interview.uploaded_at)}
         {interview.analyzed_at ? ` · analyzed ${relativeTime(interview.analyzed_at)}` : ''}
@@ -109,18 +107,16 @@ export default async function InterviewDetailPage({ params }: PageProps) {
       </p>
 
       {interview.status === 'queued' || interview.status === 'processing' ? (
-        <section className="mt-10 rounded-lg border border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg-surface)] p-6 text-sm text-[var(--color-text-secondary)]">
-          Analysis in progress. This page will fill in once the model finishes.
-          Refresh in a moment.
+        <section className="t-body-m mt-10 rounded-lg border border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg-surface)] p-6 text-[var(--color-text-secondary)]">
+          Analysis in progress. This page will fill in once the model finishes. Refresh in a
+          moment.
         </section>
       ) : null}
 
       {interview.status === 'failed' ? (
         <section className="mt-10 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-6">
-          <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-            Analysis failed
-          </h2>
-          <p className="mt-3 text-sm text-[var(--color-text-primary)]">
+          <h2 className="t-eyebrow text-[var(--color-text-secondary)]">Analysis failed</h2>
+          <p className="t-body-m mt-3 text-[var(--color-text-primary)]">
             {interview.failure_reason ?? 'No reason recorded.'}
           </p>
         </section>
@@ -130,24 +126,20 @@ export default async function InterviewDetailPage({ params }: PageProps) {
         <>
           <section className="mt-10">
             <div className="flex items-center justify-between">
-              <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-                Summary
-              </h2>
+              <h2 className="t-eyebrow text-[var(--color-text-secondary)]">Summary</h2>
               {analysis.sentiment ? (
                 <span
-                  className={`rounded-full px-3 py-1 font-mono text-xs font-medium uppercase tracking-wide ${SENTIMENT_STYLE[analysis.sentiment] ?? ''}`}
+                  className={`t-eyebrow rounded-full px-3 py-1 ${SENTIMENT_STYLE[analysis.sentiment] ?? ''}`}
                 >
                   {SENTIMENT_LABEL[analysis.sentiment] ?? analysis.sentiment}
                 </span>
               ) : null}
             </div>
-            <p className="mt-4 font-display text-lg leading-relaxed text-[var(--color-text-primary)]">
-              {analysis.summary}
-            </p>
+            <p className="t-subhead mt-4 text-[var(--color-text-primary)]">{analysis.summary}</p>
           </section>
 
           <section className="mt-12">
-            <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+            <h2 className="t-eyebrow text-[var(--color-text-secondary)]">
               Themes ({themes.length})
             </h2>
             <ul className="mt-4 space-y-4">
@@ -159,14 +151,12 @@ export default async function InterviewDetailPage({ params }: PageProps) {
                     className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-5"
                   >
                     <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="font-display text-xl tracking-tight text-[var(--color-text-primary)]">
-                        {theme.name}
-                      </h3>
-                      <span className="shrink-0 font-mono text-xs text-[var(--color-text-tertiary)]">
+                      <h3 className="t-display-3 text-[var(--color-text-primary)]">{theme.name}</h3>
+                      <span className="t-code shrink-0 text-[var(--color-text-tertiary)]">
                         {themeQuotes.length} {themeQuotes.length === 1 ? 'quote' : 'quotes'}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                    <p className="t-body-m mt-2 text-[var(--color-text-secondary)]">
                       {theme.description}
                     </p>
                     {themeQuotes.length > 0 ? (
@@ -174,7 +164,7 @@ export default async function InterviewDetailPage({ params }: PageProps) {
                         {themeQuotes.map((quote, qi) => (
                           <li
                             key={`${theme.name}-q-${qi}`}
-                            className="border-l-2 border-[var(--color-accent)] pl-4 font-display text-base italic text-[var(--color-text-primary)]"
+                            className="t-italic-stat border-l-2 border-[var(--color-accent)] pl-4 text-[var(--color-text-primary)]"
                           >
                             &ldquo;{quote.text}&rdquo;
                           </li>
@@ -187,7 +177,7 @@ export default async function InterviewDetailPage({ params }: PageProps) {
             </ul>
           </section>
 
-          <p className="mt-12 font-mono text-xs text-[var(--color-text-tertiary)]">
+          <p className="t-code mt-12 text-[var(--color-text-tertiary)]">
             {analysis.input_tokens?.toLocaleString() ?? 0} input tokens ·{' '}
             {analysis.output_tokens?.toLocaleString() ?? 0} output tokens
           </p>

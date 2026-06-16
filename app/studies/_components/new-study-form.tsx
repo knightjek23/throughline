@@ -65,16 +65,14 @@ export function NewStudyForm() {
       onSubmit={onSubmit}
       className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-6"
     >
-      <h2 className="font-display text-2xl tracking-tight text-[var(--color-text-primary)]">
-        New study
-      </h2>
-      <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+      <h2 className="t-display-2 text-[var(--color-text-primary)]">New study</h2>
+      <p className="t-body-m mt-1 text-[var(--color-text-secondary)]">
         Name the study and write the research question driving it.
       </p>
 
       <div className="mt-5 space-y-4">
         <label className="block">
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">Name</span>
+          <span className="t-body-m text-[var(--color-text-primary)]">Name</span>
           <input
             type="text"
             value={name}
@@ -82,14 +80,13 @@ export function NewStudyForm() {
             required
             maxLength={120}
             placeholder="Q2 onboarding interviews"
-            className="mt-1.5 block w-full rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:outline-2 focus:outline-offset-[-1px] focus:outline-[var(--color-accent)]"
+            className="t-body-m mt-1.5 block w-full rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-2 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:outline-2 focus:outline-offset-[-1px] focus:outline-[var(--color-accent)]"
           />
         </label>
 
         <label className="block">
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">
-            Research question{' '}
-            <span className="font-normal text-[var(--color-text-tertiary)]">(optional)</span>
+          <span className="t-body-m text-[var(--color-text-primary)]">
+            Research question <span className="text-[var(--color-text-tertiary)]">(optional)</span>
           </span>
           <textarea
             value={researchQuestion}
@@ -97,13 +94,13 @@ export function NewStudyForm() {
             maxLength={280}
             rows={3}
             placeholder="What's blocking new users from completing onboarding?"
-            className="mt-1.5 block w-full resize-none rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:outline-2 focus:outline-offset-[-1px] focus:outline-[var(--color-accent)]"
+            className="t-body-m mt-1.5 block w-full resize-none rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-2 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent)] focus:outline-2 focus:outline-offset-[-1px] focus:outline-[var(--color-accent)]"
           />
         </label>
       </div>
 
       {error && (
-        <p className="mt-4 text-sm text-[var(--color-error)]" role="alert">
+        <p className="t-body-m mt-4 text-[var(--color-error)]" role="alert">
           {error}
         </p>
       )}
@@ -112,7 +109,7 @@ export function NewStudyForm() {
         <button
           type="submit"
           disabled={submitting || !name.trim()}
-          className="rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="t-body-m rounded-md bg-[var(--color-accent)] px-4 py-2 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? 'Creating…' : 'Create study'}
         </button>
