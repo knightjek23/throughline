@@ -78,13 +78,15 @@ const toolOutputSchema = z.object({
   themes: z
     .array(
       z.object({
-        name: z.string().min(2).max(60),
+        // Aggregate names go up to 80 chars; see studyThemesSchema rationale.
+        name: z.string().min(2).max(80),
         description: z.string().min(10).max(280),
         frequency: z.number().int().positive(),
         source_theme_refs: z
           .array(
             z.object({
               interview_id: z.string(),
+              // theme_name references a per-interview theme, which is capped at 60.
               theme_name: z.string().min(2).max(60),
             }),
           )

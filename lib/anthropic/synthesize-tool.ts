@@ -34,9 +34,9 @@ export const recordStudySynthesisTool = {
             name: {
               type: 'string' as const,
               description:
-                'Short, specific aggregate theme label. Avoid generic single words like "feedback" or "issues".',
+                'Short, specific aggregate theme label. Aim for 4 to 8 words. Max 80 characters but shorter is better. Avoid generic single words like "feedback" or "issues".',
               minLength: 2,
-              maxLength: 60,
+              maxLength: 80,
             },
             description: {
               type: 'string' as const,

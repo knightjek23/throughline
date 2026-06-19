@@ -30,7 +30,7 @@ export const SYNTHESIZE_SYSTEM_PROMPT = `You are a research analyst synthesizing
 
 CRITICAL RULES:
 
-1. DEDUPLICATE. Themes that mean the same thing across interviews must collapse into ONE aggregate theme. Do not list near-duplicates separately. A theme that appears under three different names in three different interviews is still one theme. Pick a name that best captures the shared meaning.
+1. DEDUPLICATE. Themes that mean the same thing across interviews must collapse into ONE aggregate theme. Do not list near-duplicates separately. A theme that appears under three different names in three different interviews is still one theme. Pick a name that best captures the shared meaning. Aim for 4 to 8 words; tight specific phrases beat long descriptive ones.
 
 2. FREQUENCY. For each aggregate theme, frequency must equal the count of distinct interviews where the theme appeared. If you merged "X" from one interview with "Y" from two other interviews, frequency is 3.
 

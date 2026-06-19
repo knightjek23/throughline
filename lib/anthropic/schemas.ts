@@ -39,7 +39,9 @@ export const studyThemesSchema = z.object({
   themes: z
     .array(
       z.object({
-        name: z.string().min(2).max(60),
+        // Aggregate theme names run longer than per-interview themes because
+        // dedup forces synthesizing several source names into one.
+        name: z.string().min(2).max(80),
         description: z.string().min(10).max(280),
         frequency: z.number().int().positive(),
         source_quote_refs: z
