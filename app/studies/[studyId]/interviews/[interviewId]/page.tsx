@@ -16,6 +16,10 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ensureUser } from '@/lib/users';
 import { createServerClient } from '@/lib/supabase/server';
+import {
+  InterviewDetailPoller,
+  type InterviewStatus,
+} from './_components/interview-detail-poller';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,6 +93,11 @@ export default async function InterviewDetailPage({ params }: PageProps) {
   const quotes = (analysis?.quotes_json as Quote[] | null) ?? [];
 
   return (
+    <InterviewDetailPoller
+      studyId={studyId}
+      interviewId={interviewId}
+      initialStatus={interview.status as InterviewStatus}
+    >
     <main className="mx-auto max-w-3xl px-6 py-16">
       <Link
         href={`/studies/${studyId}`}
@@ -184,5 +193,6 @@ export default async function InterviewDetailPage({ params }: PageProps) {
         </>
       ) : null}
     </main>
+    </InterviewDetailPoller>
   );
 }
