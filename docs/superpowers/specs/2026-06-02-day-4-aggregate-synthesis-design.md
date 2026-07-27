@@ -86,3 +86,21 @@ Per typical study (10 interviews, ~5 themes + 80-char description each = ~50 the
 ## Dogfood plan
 
 Three synthetic transcripts (existing fixture + two new) with overlapping but distinct themes so the dedup has real variance to work with. Upload all three to one study, wait for synthesis, evaluate against the 3-criteria hypothesis.
+
+## Dogfood result (2026-06-19)
+
+Day 4 ships. Spec pivoted mid-build: auto-trigger removed in favor of a user-clicked CTA on the Aggregate tab. Reasoning: auto-trigger silently masked synthesis failures (the first attempt threw `InvalidAnalysisFormatError` because aggregate theme names ran over the 60-char cap, and the failure was invisible). With the CTA, the failure surfaces inline. Same plumbing, better UX, faster diagnosis.
+
+**Schema fix applied:** Bumped `name` max from 60 to 80 chars across `studyThemesSchema`, `toolOutputSchema`, and `recordStudySynthesisTool` input schema. Aggregate theme names need more room than per-interview names because dedup forces synthesizing multiple source labels into one. Prompt updated to nudge 4-to-8-word names.
+
+**Hypothesis result:** First successful synthesis on the three-transcript fixture returned 7 aggregate themes with frequency counts (three at 3, four at 2). Themes feel substantive and trace cleanly back to per-interview source themes via `source_theme_refs`. Researcher would read the aggregate and see things they did not get from any single interview. Rated 4+/5 across all three criteria. Ships.
+
+**Bonus that landed in this cycle:**
+- User-triggered synthesis route (`POST /api/studies/[studyId]/synthesize`) replaced the auto-trigger + QStash job route.
+- New typography system applied site-wide: Lora display + Inter UI (variable, 200/300/400/500) + Geist Mono code, with 10 semantic utility classes (`.t-display-1` through `.t-code`).
+
+**Known follow-ups not blocking Day 5:**
+- Drill-down to source quotes per aggregate theme (originally Day 5 scope)
+- "Re-synthesize" button on the aggregate view for reruns
+- Auto-poll on interview detail page
+- Per-interview prompt tuning (Day 3 follow-up; aggregate prompt is fine)
