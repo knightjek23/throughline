@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { check } from '@/lib/ratelimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -67,7 +68,17 @@ async function checkAnthropic(): Promise<{ result: CheckResult; latency: number;
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  // This route is public and the Anthropic ping costs real money per hit.
+  // Rate limit by IP (20/min, shared with the auth limiter) so a scraper
+  // can't run up the API bill. Uptime monitors ping ~1/min, well under it.
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  const rl = await check('auth', `health:${ip}`).catch(() => null);
+  if (rl && !rl.success) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
+  }
+
   const [db, anthropic] = await Promise.all([checkDb(), checkAnthropic()]);
 
   const allOk = db.result === 'ok' && anthropic.result === 'ok';

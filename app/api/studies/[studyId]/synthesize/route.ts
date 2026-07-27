@@ -15,7 +15,8 @@ import { createServerClient } from '@/lib/supabase/server';
 import { ensureUser } from '@/lib/users';
 import { synthesizeStudy, type SynthesizeStudyInterview } from '@/lib/anthropic/synthesize';
 import { failureReason } from '@/lib/anthropic/failure-reason';
-import { jsonOk, jsonError, jsonUnauthorized } from '@/lib/api/responses';
+import { check } from '@/lib/ratelimit';
+import { jsonOk, jsonError, jsonUnauthorized, jsonRateLimited } from '@/lib/api/responses';
 import { track } from '@/lib/posthog';
 import { logger } from '@/lib/logger';
 
@@ -52,6 +53,15 @@ export async function POST(
   const { studyId } = await context.params;
   const { userId } = await auth();
   if (!userId) return jsonUnauthorized();
+
+  // Rate limit: 10 syntheses/hour per user. This is the most expensive
+  // route in the app; without a cap a single user could run unbounded
+  // concurrent Anthropic calls.
+  const rl = await check('synthesize', userId);
+  if (!rl.success) {
+    const retrySeconds = Math.max(0, Math.ceil((rl.reset - Date.now()) / 1000));
+    return jsonRateLimited(retrySeconds);
+  }
 
   await ensureUser();
   const supabase = await createServerClient();
@@ -143,7 +153,9 @@ export async function POST(
     const { error: insertErr } = await supabase.from('study_themes').insert(themeRows);
     if (insertErr) throw insertErr;
 
-    void track('aggregate_synthesized', userId, {
+    // Awaited: a `void` fire-and-forget can be dropped when the serverless
+    // function freezes right after the response is returned.
+    await track('aggregate_synthesized', userId, {
       studyId,
       themeCount: result.themes.length,
       droppedThemes: result.droppedThemes,
