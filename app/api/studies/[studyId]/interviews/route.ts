@@ -106,8 +106,10 @@ export async function POST(req: Request, { params }: RouteContext) {
 
   // Generate the interview id upfront so storage path and DB row match.
   const interviewId = randomUUID();
-  const ext = file.name.toLowerCase().endsWith('.txt') ? 'txt' : 'txt';
-  const storagePath = `${userId}/${studyId}/${interviewId}.${ext}`;
+  // v0 accepts only text/plain, so the stored extension is always txt.
+  // When vtt/srt/docx land, derive this from the validated MIME type
+  // (not the user-supplied filename).
+  const storagePath = `${userId}/${studyId}/${interviewId}.txt`;
 
   // Upload raw file to Supabase Storage. Use admin client because the
   // storage policies check `(storage.foldername(name))[1] = clerk_user_id()`;
