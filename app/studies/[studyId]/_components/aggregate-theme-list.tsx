@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export interface AggregateDrillDownEntry {
   interview_id: string;
@@ -22,8 +23,11 @@ interface Props {
   rows: AggregateThemeRow[];
 }
 
-export function AggregateThemeList({ rows }: Props) {
+export function AggregateThemeList({ studyId, rows }: Props) {
+  const router = useRouter();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [resyncPending, setResyncPending] = useState(false);
+  const [resyncError, setResyncError] = useState<string | null>(null);
 
   function toggle(themeId: string) {
     setExpanded((prev) => {
@@ -37,9 +41,48 @@ export function AggregateThemeList({ rows }: Props) {
     });
   }
 
+  async function onResync() {
+    setResyncPending(true);
+    setResyncError(null);
+    try {
+      const res = await fetch(`/api/studies/${studyId}/synthesize`, { method: 'POST' });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error || `Re-synthesis failed (${res.status})`);
+      }
+      router.refresh();
+      // Pending stays true until refresh swaps in new themes and unmounts us.
+    } catch (err) {
+      setResyncError(err instanceof Error ? err.message : 'Re-synthesis failed.');
+      setResyncPending(false);
+    }
+  }
+
   return (
     <section className="mt-10">
-      <ul className="space-y-4">
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <p className="t-eyebrow text-[var(--color-text-secondary)]">
+          {rows.length} aggregate {rows.length === 1 ? 'theme' : 'themes'}
+        </p>
+        <button
+          type="button"
+          onClick={onResync}
+          disabled={resyncPending}
+          className="t-body-m rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-2 text-[var(--color-text-primary)] transition-colors duration-200 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {resyncPending ? 'Synthesizing…' : 'Re-synthesize'}
+        </button>
+      </div>
+
+      {resyncError && (
+        <p className="t-body-m mb-4 text-[var(--color-error)]" role="alert">
+          {resyncError}
+        </p>
+      )}
+
+      <ul
+        className={`space-y-4 transition-opacity duration-200 ${resyncPending ? 'opacity-50' : 'opacity-100'}`}
+      >
         {rows.map((theme) => {
           const isExpanded = expanded.has(theme.id);
           const drillCount = theme.drillDown.length;
