@@ -58,7 +58,7 @@ export async function POST(req: Request) {
   // Move to processing. If the row is gone, bail without retry.
   const { data: interview, error: fetchErr } = await supabase
     .from('interviews')
-    .select('id, transcript_text, participant_label, study_id')
+    .select('id, user_id, transcript_text, participant_label, study_id')
     .eq('id', interviewId)
     .maybeSingle();
 
@@ -75,6 +75,13 @@ export async function POST(req: Request) {
     return jsonOk({ skipped: 'no_transcript' });
   }
 
+  // Never trust the payload for ownership: derive user_id from the interview
+  // row itself. The payload copy is used only for logging/telemetry sanity.
+  const ownerId = interview.user_id;
+  if (ownerId !== userId) {
+    logger.warn({ interviewId, payloadUserId: userId, ownerId }, 'payload userId mismatch; using row owner');
+  }
+
   await supabase
     .from('interviews')
     .update({ status: 'processing' })
@@ -82,10 +89,11 @@ export async function POST(req: Request) {
 
   // Pull research_question from the parent study so the analysis prompt
   // (Day 3+) can use it as context. Stub ignores it but Day 3 won't.
+  // Use the interview row's study_id (not the payload's) for the same reason.
   const { data: study } = await supabase
     .from('studies')
     .select('research_question')
-    .eq('id', studyId)
+    .eq('id', interview.study_id)
     .maybeSingle();
 
   try {
@@ -103,7 +111,7 @@ export async function POST(req: Request) {
       .upsert(
         {
           interview_id: interviewId,
-          user_id: userId,
+          user_id: ownerId,
           summary: result.analysis.summary,
           sentiment: result.analysis.sentiment,
           themes_json: result.analysis.themes,
@@ -120,7 +128,7 @@ export async function POST(req: Request) {
       .update({ status: 'analyzed', analyzed_at: new Date().toISOString(), failure_reason: null })
       .eq('id', interviewId);
 
-    void track('interview_analyzed', userId, {
+    await track('interview_analyzed', ownerId, {
       interviewId,
       studyId,
       droppedQuotes: result.droppedQuotes,
@@ -134,7 +142,7 @@ export async function POST(req: Request) {
     const reason = failureReason(err);
     logger.error({ err, interviewId }, 'analyze failed');
     await markFailed(interviewId, reason);
-    void track('interview_failed', userId, { interviewId, studyId, reason });
+    await track('interview_failed', ownerId, { interviewId, studyId, reason });
     // Return 200 so QStash doesn't retry. We've already recorded the failure.
     return jsonOk({ ok: false, interviewId, reason });
   }
