@@ -51,7 +51,9 @@ export function AggregateThemeList({ studyId, rows }: Props) {
         throw new Error(body.error || `Re-synthesis failed (${res.status})`);
       }
       router.refresh();
-      // Pending stays true until refresh swaps in new themes and unmounts us.
+      // Reset pending: router.refresh() re-renders this component with fresh
+      // server data but does NOT unmount it, so we own the state reset.
+      setResyncPending(false);
     } catch (err) {
       setResyncError(err instanceof Error ? err.message : 'Re-synthesis failed.');
       setResyncPending(false);
