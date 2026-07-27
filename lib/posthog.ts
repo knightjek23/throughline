@@ -43,7 +43,10 @@ export async function track(
   if (!ph) return;
   ph.capture({ distinctId: userId, event, properties });
   // Force flush — server runtimes don't get a graceful shutdown.
-  await ph.shutdown().catch(() => {
+  // Use flush(), not shutdown(): shutdown() permanently disables the client,
+  // and since it stays cached, every later event on a warm serverless
+  // instance would be silently dropped.
+  await ph.flush().catch(() => {
     /* swallow — analytics shouldn't fail user requests */
   });
 }
