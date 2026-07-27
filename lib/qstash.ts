@@ -14,7 +14,11 @@ import 'server-only';
 import { Client, Receiver } from '@upstash/qstash';
 import { logger } from './logger';
 
-const isDev = process.env.NEXT_PUBLIC_APP_ENV === 'development';
+// Security: gate the dev bypass on NODE_ENV, not NEXT_PUBLIC_APP_ENV.
+// NEXT_PUBLIC_* vars are client-exposed config, and a preview deploy with
+// APP_ENV=development would have let anyone invoke /api/jobs/* with the
+// bypass header. NODE_ENV is 'development' only under `next dev`.
+const isDev = process.env.NODE_ENV === 'development';
 
 // Lazy clients so missing env vars don't blow up module load in dev.
 let cachedClient: Client | null = null;
@@ -53,7 +57,7 @@ export interface EnqueueArgs<T> {
 /**
  * Header the dev fallback sets so the target route can accept the call
  * without a real QStash signature. Production routes still require a real
- * signature; the bypass is checked only when NEXT_PUBLIC_APP_ENV === 'development'.
+ * signature; the bypass is checked only when NODE_ENV === 'development'.
  */
 export const DEV_BYPASS_HEADER = 'x-throughline-dev-bypass';
 
