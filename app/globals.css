@@ -19,9 +19,10 @@
   --color-text-tertiary: #B0ADAA;  /* Mist */
 
   /* Accent for CTAs, theme chips, active states */
-  --color-accent: #C47A5A;         /* Muted Terracotta */
-  --color-accent-hover: #A86245;
-  --color-accent-soft: #F4E3D8;    /* Badge / chip backgrounds */
+  --color-accent: #7B4A74;         /* Damson */
+  --color-accent-hover: #683E62;
+  --color-accent-ring: #B57FAD;    /* Stroke-lighten CTA rim */
+  --color-accent-soft: #F0E6EE;    /* Badge / chip backgrounds */
 
   /* Semantic */
   --color-success: #6B8E5E;        /* Analyzed status */
@@ -147,7 +148,7 @@ body {
 .cta-hover { position: relative; isolation: isolate; }
 .cta-hover::before {
   content: ""; position: absolute; inset: 0; box-sizing: border-box;
-  border-radius: inherit; padding: 2px; background: var(--color-accent-soft);
+  border-radius: inherit; padding: 2px; background: var(--color-accent-ring);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
   opacity: 0; transition: opacity 0.2s ease; z-index: 1; pointer-events: none;
