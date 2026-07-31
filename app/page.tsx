@@ -88,7 +88,7 @@ function PricingCard({
         href="/sign-up"
         className={`t-body-m mt-8 inline-flex w-full items-center justify-center rounded-md px-5 py-3 transition-colors duration-200 ${
           emphasized
-            ? 'bg-[var(--color-accent)] text-[var(--color-bg-base)] hover:bg-[var(--color-accent-hover)]'
+            ? 'cta-hover bg-[var(--color-accent)] text-[var(--color-bg-base)] hover:bg-[var(--color-accent-hover)]'
             : 'border border-[var(--color-border-default)] text-[var(--color-text-primary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-subtle)]'
         }`}
       >
@@ -123,7 +123,7 @@ export default function HomePage() {
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <Link
             href="/sign-up"
-            className="t-body-m rounded-md bg-[var(--color-accent)] px-5 py-3 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+            className="t-body-m cta-hover rounded-md bg-[var(--color-accent)] px-5 py-3 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
           >
             Start 21-day trial
           </Link>
@@ -315,7 +315,7 @@ export default function HomePage() {
         <div className="mt-10">
           <Link
             href="/sign-up"
-            className="t-body-m inline-flex items-center rounded-md bg-[var(--color-accent)] px-6 py-3 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+            className="t-body-m cta-hover inline-flex items-center rounded-md bg-[var(--color-accent)] px-6 py-3 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
           >
             Start 21-day trial
           </Link>

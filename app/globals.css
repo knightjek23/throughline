@@ -137,3 +137,20 @@ body {
   font-weight: 400;
   font-variant-ligatures: none;
 }
+
+/* ---------------------------------------------------------------------------
+ * Knight UX stroke-lighten CTA. An accent rim lightens in around the button on
+ * hover; the button and text never change size, so nothing reflows. The rim
+ * reads from the accent tokens, so it wears Throughline's muted terracotta.
+ * Applied to the primary "Start 21-day trial" CTAs.
+ * ------------------------------------------------------------------------- */
+.cta-hover { position: relative; isolation: isolate; }
+.cta-hover::before {
+  content: ""; position: absolute; inset: 0; box-sizing: border-box;
+  border-radius: inherit; padding: 2px; background: var(--color-accent-soft);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity 0.2s ease; z-index: 1; pointer-events: none;
+}
+.cta-hover:hover::before, .cta-hover:focus-visible::before { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .cta-hover::before { transition-duration: 0.001ms; } }
