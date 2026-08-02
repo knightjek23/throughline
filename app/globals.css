@@ -38,6 +38,29 @@
   --font-display: var(--font-lora), Charter, Georgia, serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace;
+
+  /* Tailwind's bare `transition-*` utilities inherit these, so anything without
+     an explicit duration lands on the house hover timing rather than 150ms. */
+  --default-transition-duration: 160ms;
+}
+
+:root {
+  /* ---- Knight UX motion tokens ----------------------------------------
+     Shared across all four products. Easing first, then the duration ladder.
+     The built-in CSS keywords are deliberately weak curves; these have the
+     punch that makes motion read as intentional. Never ease-in on UI: it
+     delays the first frame, which is the frame the user is watching. */
+  --ku-ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ku-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ku-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --ku-dur-press:   120ms;  /* :active feedback */
+  --ku-dur-hover:   160ms;  /* colour crossfades */
+  --ku-dur-tooltip: 140ms;
+  --ku-dur-pop:     200ms;  /* dropdowns, rings, small popovers */
+  --ku-dur-modal:   260ms;  /* modals, drawers, sheets */
+  --ku-dur-reveal:  600ms;  /* marketing scroll reveal only */
+  --ku-dur-spin:    700ms;
 }
 
 body {
@@ -142,16 +165,58 @@ body {
 /* ---------------------------------------------------------------------------
  * Knight UX stroke-lighten CTA. An accent rim lightens in around the button on
  * hover; the button and text never change size, so nothing reflows. The rim
- * reads from the accent tokens, so it wears Throughline's muted terracotta.
- * Applied to the primary "Start 21-day trial" CTAs.
+ * reads from the accent tokens, so it wears Throughline's damson.
+ *
+ * The rim is a spread shadow, not a masked pseudo-element. A masked ring shares
+ * one border-radius between its outer and inner edge, so the stroke visibly
+ * pinches at the corners; a spread shadow draws both corners concentrically and
+ * holds an even weight the whole way round. Same mechanism across the suite.
  * ------------------------------------------------------------------------- */
-.cta-hover { position: relative; isolation: isolate; }
-.cta-hover::before {
-  content: ""; position: absolute; inset: 0; box-sizing: border-box;
-  border-radius: inherit; padding: 2px; background: var(--color-accent-ring);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  opacity: 0; transition: opacity 0.2s ease; z-index: 1; pointer-events: none;
+.cta-hover {
+  position: relative;
+  box-shadow: 0 0 0 2px transparent;
+  transition:
+    background-color var(--ku-dur-hover) ease,
+    box-shadow var(--ku-dur-pop) var(--ku-ease-out),
+    transform var(--ku-dur-press) var(--ku-ease-out);
 }
-.cta-hover:hover::before, .cta-hover:focus-visible::before { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .cta-hover::before { transition-duration: 0.001ms; } }
+
+/* Hover is gated behind a real pointer. On touch, a tap fires :hover and the
+   state sticks until the next tap somewhere else. */
+@media (hover: hover) and (pointer: fine) {
+  .cta-hover:hover { box-shadow: 0 0 0 2px var(--color-accent-ring); }
+}
+
+.cta-hover:focus-visible { box-shadow: 0 0 0 2px var(--color-accent-ring); }
+
+/* Press feedback. Any pressable surface must feel like it heard you. */
+.cta-hover:active,
+.ku-press:not(:disabled):active { transform: scale(0.97); }
+
+.ku-press {
+  transition:
+    background-color var(--ku-dur-hover) ease,
+    border-color var(--ku-dur-hover) ease,
+    opacity var(--ku-dur-hover) ease,
+    transform var(--ku-dur-press) var(--ku-ease-out);
+}
+
+.cta-hover:disabled {
+  transform: none;
+  box-shadow: 0 0 0 2px transparent;
+}
+
+/* Reduced motion means less movement, not no transitions. Movement and looping
+   animation stop; colour, opacity and shadow still crossfade, so state changes
+   stay readable rather than snapping like glitches. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property:
+      background-color, border-color, color, fill, stroke, opacity,
+      box-shadow !important;
+  }
+}

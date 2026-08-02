@@ -104,7 +104,7 @@ export function InterviewList({ studyId, initial }: Props) {
         <li key={row.id}>
           <Link
             href={`/studies/${studyId}/interviews/${row.id}`}
-            className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--color-bg-subtle)]"
+            className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-[var(--ku-dur-hover)] hover:bg-[var(--color-bg-subtle)]"
           >
             <div className="min-w-0 flex-1">
               <p className="t-body-l truncate text-[var(--color-text-primary)]">{row.filename}</p>

@@ -70,7 +70,7 @@ export function AggregateThemeList({ studyId, rows }: Props) {
           type="button"
           onClick={onResync}
           disabled={resyncPending}
-          className="t-body-m rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-2 text-[var(--color-text-primary)] transition-colors duration-200 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="t-body-m ku-press rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-2 text-[var(--color-text-primary)] transition-colors duration-[var(--ku-dur-hover)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {resyncPending ? 'Synthesizing…' : 'Re-synthesize'}
         </button>
@@ -83,7 +83,7 @@ export function AggregateThemeList({ studyId, rows }: Props) {
       )}
 
       <ul
-        className={`space-y-4 transition-opacity duration-200 ${resyncPending ? 'opacity-50' : 'opacity-100'}`}
+        className={`space-y-4 transition-opacity duration-[var(--ku-dur-hover)] ${resyncPending ? 'opacity-50' : 'opacity-100'}`}
       >
         {rows.map((theme) => {
           const isExpanded = expanded.has(theme.id);

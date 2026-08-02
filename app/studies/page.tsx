@@ -55,7 +55,7 @@ export default async function StudiesPage() {
               <li key={study.id}>
                 <Link
                   href={`/studies/${study.id}`}
-                  className="flex items-baseline justify-between gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--color-bg-subtle)]"
+                  className="flex items-baseline justify-between gap-4 px-5 py-4 transition-colors duration-[var(--ku-dur-hover)] hover:bg-[var(--color-bg-subtle)]"
                 >
                   <div className="min-w-0">
                     <p className="t-display-3 truncate text-[var(--color-text-primary)]">

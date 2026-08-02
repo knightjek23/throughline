@@ -109,7 +109,7 @@ export function NewStudyForm() {
         <button
           type="submit"
           disabled={submitting || !name.trim()}
-          className="t-body-m rounded-md bg-[var(--color-accent)] px-4 py-2 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="t-body-m ku-press rounded-md bg-[var(--color-accent)] px-4 py-2 text-[var(--color-bg-base)] transition-colors duration-[var(--ku-dur-hover)] hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? 'Creating…' : 'Create study'}
         </button>

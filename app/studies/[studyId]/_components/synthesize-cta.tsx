@@ -59,7 +59,7 @@ export function SynthesizeCTA({ studyId, analyzedInterviewCount, minInterviews }
           type="button"
           onClick={onClick}
           disabled={pending}
-          className="t-body-m rounded-md bg-[var(--color-accent)] px-5 py-3 text-[var(--color-bg-base)] transition-colors duration-200 hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="t-body-m ku-press rounded-md bg-[var(--color-accent)] px-5 py-3 text-[var(--color-bg-base)] transition-colors duration-[var(--ku-dur-hover)] hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? 'Synthesizing…' : 'Synthesize aggregate themes'}
         </button>
