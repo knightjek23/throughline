@@ -54,22 +54,33 @@ function relativeTime(iso: string): string {
 }
 
 export function InterviewList({ studyId, initial }: Props) {
-  const [rows, setRows] = useState<InterviewRow[]>(initial);
+  // The server render is the source of truth; polled rows are an overlay on top
+  // of it. When a fresh server render arrives (router.refresh after an upload)
+  // the overlay is dropped so the new rows win.
+  //
+  // This used to be `setRows(initial)` inside an effect, which is the pattern
+  // react-hooks/set-state-in-effect flags: it commits a render, then immediately
+  // schedules another. Comparing the prop against the last one seen and adjusting
+  // during render is React's documented alternative. React discards the in-progress
+  // render and retries with the new state before committing anything, so there is
+  // no cascade and no flash of stale rows.
+  const [polledRows, setPolledRows] = useState<InterviewRow[] | null>(null);
+  const [lastServerRows, setLastServerRows] = useState(initial);
   const pollingRef = useRef(false);
 
-  // Sync from the server (router.refresh from upload form) into client state.
-  // Without this, freshly uploaded rows wouldn't replace stale ones from the
-  // initial server render.
-  useEffect(() => {
-    setRows(initial);
-  }, [initial]);
+  if (initial !== lastServerRows) {
+    setLastServerRows(initial);
+    setPolledRows(null);
+  }
+
+  const rows = polledRows ?? initial;
 
   const tick = useCallback(async () => {
     try {
       const res = await fetch(`/api/studies/${studyId}/interviews`, { cache: 'no-store' });
       if (!res.ok) return;
       const body = (await res.json()) as { interviews: InterviewRow[] };
-      setRows(body.interviews);
+      setPolledRows(body.interviews);
     } catch {
       /* swallow — try again on the next tick */
     }
