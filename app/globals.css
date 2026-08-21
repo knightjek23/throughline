@@ -3,7 +3,7 @@
 /**
  * Throughline design tokens.
  * Colors: Editorial Research palette (Cloud Dancer + Muted Terracotta accent).
- * Type: Text Hierarchy v1.0 (Lora display + Inter UI + Geist Mono code).
+ * Type: Text Hierarchy v1.0 (Lora display + Outfit UI + Geist Mono code).
  * Locked to light mode for v1.
  */
 
@@ -23,6 +23,8 @@
   --color-accent-hover: #683E62;
   --color-accent-ring: #B57FAD;    /* Stroke-lighten CTA rim */
   --color-accent-soft: #F0E6EE;    /* Badge / chip backgrounds */
+  --color-accent-wash: #E4D1E1;    /* Evidence highlight rest, 9.67:1 with ink */
+  --color-accent-tint: #D2B2CE;    /* Evidence highlight hover, 7.33:1 with ink */
 
   /* Semantic */
   --color-success: #6B8E5E;        /* Analyzed status */
@@ -204,6 +206,84 @@ body {
 .cta-hover:disabled {
   transform: none;
   box-shadow: 0 0 0 2px transparent;
+}
+
+/* ---------- Evidence spine (Day 7) ----------------------------------------
+   The transcript renders one element per segment, quoted or not, because
+   selection offsets are resolved from data-start. See lib/evidence/selection.
+
+   Contrast, measured rather than assumed, against --color-text-primary #2C2C2A:
+     rest fill  --color-accent-wash #E4D1E1  9.67:1
+     hover fill --color-accent-tint #D2B2CE  7.33:1
+   --color-accent-soft is deliberately NOT the fill here. It measures 1.15:1
+   against --color-bg-surface, so on a paper card it reads as no highlight at
+   all. It was designed for chips on bone. accent-wash sits at 1.36:1 against
+   paper, and the hover step from wash to tint is 1.32:1, both perceptible.
+   The focus ring uses --color-accent rather than --color-accent-ring: the ring
+   sits directly against the accent-soft fill, where accent-ring measures
+   2.61:1 and fails WCAG 1.4.11's 3:1 for non-text contrast. --color-accent
+   measures 5.61:1 on the fill and 6.44:1 on paper.
+--------------------------------------------------------------------------- */
+
+.ku-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.transcript-block {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 4rem;
+}
+
+/* display: inline so a highlight spanning a line break wraps like the text
+   around it instead of being pushed onto its own line as a button box. */
+.evidence-mark {
+  display: inline;
+  padding: 0 4px;
+  border-radius: 2px;
+  background-color: var(--color-accent-wash);
+  border-bottom: 2px solid var(--color-accent);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  /* The mark is an anchor so it wraps inline. Cloning the decoration means the
+     fill, the rule and the focus ring repeat on every line fragment instead of
+     being drawn once around the whole run. */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition-property: background-color, box-shadow;
+  transition-duration: var(--ku-dur-hover);
+  transition-timing-function: var(--ku-ease-out);
+}
+
+.evidence-quote {
+  border-radius: 2px;
+  cursor: pointer;
+  transition-property: background-color, box-shadow;
+  transition-duration: var(--ku-dur-hover);
+  transition-timing-function: var(--ku-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .evidence-mark:hover {
+    background-color: var(--color-accent-tint);
+  }
+
+  .evidence-quote:hover {
+    background-color: var(--color-accent-wash);
+  }
+}
+
+.evidence-mark:focus-visible,
+.evidence-quote:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.evidence-mark[data-focused='true'],
+.evidence-quote[data-focused='true'] {
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
 
 /* Reduced motion means less movement, not no transitions. Movement and looping
