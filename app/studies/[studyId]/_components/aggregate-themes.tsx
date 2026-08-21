@@ -114,6 +114,7 @@ export async function AggregateThemes({ studyId, analyzedInterviewCount }: Props
       if (!quote) continue;
       drillDown.push({
         interview_id: ref.interview_id,
+        quote_index: ref.quote_index,
         interview_filename: interview.filename,
         source_theme_name: quote.theme,
         quote: quote.text,

@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export interface AggregateDrillDownEntry {
   interview_id: string;
+  /** Index into that interview's quotes_json. Addresses the source span. */
+  quote_index: number;
   interview_filename: string;
   source_theme_name: string;
   quote: string;
@@ -62,7 +65,7 @@ export function AggregateThemeList({ studyId, rows }: Props) {
 
   return (
     <section className="mt-10">
-      <div className="mb-5 flex items-center justify-between gap-4">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <p className="t-eyebrow text-[var(--color-text-secondary)]">
           {rows.length} aggregate {rows.length === 1 ? 'theme' : 'themes'}
         </p>
@@ -102,7 +105,7 @@ export function AggregateThemeList({ studyId, rows }: Props) {
               >
                 <h3 className="t-display-2 text-[var(--color-text-primary)]">{theme.name}</h3>
                 <span
-                  className="t-eyebrow shrink-0 rounded-full bg-[var(--color-bg-subtle)] px-3 py-1 text-[var(--color-text-secondary)]"
+                  className="t-eyebrow ku-num shrink-0 rounded-full bg-[var(--color-bg-subtle)] px-4 py-1 text-[var(--color-text-secondary)]"
                   title={`${theme.frequency ?? 0} interviews, ${drillCount} source quotes`}
                 >
                   {theme.frequency ?? 0} {theme.frequency === 1 ? 'interview' : 'interviews'}
@@ -110,27 +113,30 @@ export function AggregateThemeList({ studyId, rows }: Props) {
               </button>
 
               {theme.description ? (
-                <p className="t-body-l mt-3 text-[var(--color-text-secondary)]">
+                <p className="t-body-l mt-4 text-[var(--color-text-secondary)]">
                   {theme.description}
                 </p>
               ) : null}
 
               {isExpanded ? (
                 drillCount > 0 ? (
-                  <div className="mt-6 space-y-5 border-t border-[var(--color-border-subtle)] pt-5">
+                  <div className="mt-6 space-y-6 border-t border-[var(--color-border-subtle)] pt-6">
                     {theme.drillDown.map((entry, i) => (
                       <div key={`${theme.id}-${entry.interview_id}-${i}`}>
                         <p className="t-eyebrow text-[var(--color-text-secondary)]">
                           {entry.interview_filename} · original theme: {entry.source_theme_name}
                         </p>
-                        <p className="t-italic-stat mt-2 border-l-2 border-[var(--color-accent)] pl-4 text-[var(--color-text-primary)]">
+                        <Link
+                          href={`/studies/${studyId}/interviews/${entry.interview_id}?q=${entry.quote_index}`}
+                          className="evidence-quote t-italic-stat mt-2 block border-l-2 border-[var(--color-accent)] pl-4 text-[var(--color-text-primary)]"
+                        >
                           &ldquo;{entry.quote}&rdquo;
-                        </p>
+                        </Link>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="t-body-m mt-6 border-t border-[var(--color-border-subtle)] pt-5 text-[var(--color-text-tertiary)]">
+                  <p className="t-body-m mt-6 border-t border-[var(--color-border-subtle)] pt-6 text-[var(--color-text-tertiary)]">
                     Source quotes unavailable.
                   </p>
                 )
