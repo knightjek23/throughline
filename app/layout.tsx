@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Lora, Inter, Geist_Mono } from 'next/font/google';
+import { Lora, Outfit, Geist_Mono } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { PostHogProvider } from './providers';
 import './globals.css';
@@ -14,9 +14,9 @@ const lora = Lora({
 
 // UI sans. Variable. Used weights per the type spec: ExtraLight 200,
 // Light 300, Regular 400, Medium 500.
-const inter = Inter({
+const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-outfit',
   display: 'swap',
 });
 
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider>
       <html
         lang="en"
-        className={`${inter.variable} ${lora.variable} ${geistMono.variable}`}
+        className={`${outfit.variable} ${lora.variable} ${geistMono.variable}`}
       >
         <body className="min-h-screen">
           <PostHogProvider>{children}</PostHogProvider>

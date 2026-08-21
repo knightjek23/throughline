@@ -2,7 +2,7 @@
  * Landing page at /.
  *
  * Editorial single-scroll marketing surface. Same design tokens as the app
- * (Cloud Dancer + Muted Terracotta, Lora + Inter + Geist Mono). Copy comes
+ * (Cloud Dancer + Muted Terracotta, Lora + Outfit + Geist Mono). Copy comes
  * from the Day 6 spec's three-defense framing.
  *
  * Sections: Hero → Three defenses → How it works → Throughline vs Claude
