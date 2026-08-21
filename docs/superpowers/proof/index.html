@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Throughline evidence spine, rendered from the real stylesheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..600;1,400&family=Outfit:wght@200..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="out/tokens.css">
+<style>
+  body {
+    margin: 0;
+    background: var(--color-bg-base);
+    color: var(--color-text-primary);
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+  .wrap { max-width: 72rem; margin: 0 auto; padding: 64px 24px; }
+  .split { display: grid; grid-template-columns: 1fr; gap: 64px; }
+  @media (min-width: 1024px) { .split { grid-template-columns: 1fr 1fr; } }
+  .card {
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    border-radius: 8px;
+    padding: 24px;
+  }
+  .pane { position: relative; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .stack > * + * { margin-top: 16px; }
+  .rule { border-top: 1px solid var(--color-border-subtle); margin-top: 16px; padding-top: 16px; }
+  .filter { display: flex; gap: 8px; align-items: center; }
+  .filter button {
+    border: 0; background: transparent; padding: 8px 16px; border-radius: 6px;
+    color: var(--color-text-secondary); cursor: pointer; font: inherit;
+  }
+  .filter button[aria-pressed="true"] {
+    background: var(--color-accent-soft); color: var(--color-text-primary);
+  }
+  .run {
+    border: 0; margin: 0 8px; padding: 4px 16px; border-radius: 6px;
+    background: var(--color-bg-subtle); color: var(--color-text-secondary);
+    cursor: pointer; font-family: 'Geist Mono', monospace; font-size: 12px;
+  }
+  .selcard {
+    position: absolute; z-index: 10; transform: translateY(-100%);
+    border: 1px solid var(--color-border-strong); background: var(--color-bg-surface);
+    border-radius: 8px; padding: 16px; box-shadow: 0 8px 24px rgba(44,44,42,.12);
+  }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .swatchrow { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 16px; }
+  .swatch { min-width: 200px; }
+  p { margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="t-eyebrow" style="color:var(--color-text-secondary)">Day 7 · evidence spine · rendered from app/globals.css</p>
+  <h1 class="t-display-1" style="margin:16px 0 0">candid-onboarding-04.txt</h1>
+  <p class="t-code ku-num" style="margin-top:16px;color:var(--color-text-tertiary)">4,182 words · uploaded 2h ago · analyzed 2h ago · P4</p>
+
+  <div class="split" style="margin-top:48px">
+
+    <!-- Analysis column -->
+    <section>
+      <h2 class="t-eyebrow" style="color:var(--color-text-secondary)">Themes (3)</h2>
+      <ul class="stack" style="margin-top:16px">
+        <li class="card">
+          <div class="head">
+            <h3 class="t-display-3">Onboarding drop-off</h3>
+            <span class="t-code ku-num" style="color:var(--color-text-tertiary)">2 quotes</span>
+          </div>
+          <p class="t-body-m" style="margin-top:16px;color:var(--color-text-secondary)">Participants abandon setup at the workspace step rather than at signup.</p>
+          <ul class="rule stack">
+            <li><button class="evidence-quote t-italic-stat" data-focused="true" style="display:block;width:100%;text-align:left;border:0;border-left:2px solid var(--color-accent);padding-left:16px;background:transparent;color:inherit">&ldquo;I got to the second screen and just gave up on it&rdquo;</button></li>
+            <li><button class="evidence-quote t-italic-stat" style="display:block;width:100%;text-align:left;border:0;border-left:2px solid var(--color-accent);padding-left:16px;background:transparent;color:inherit">&ldquo;nobody told me I needed a workspace first&rdquo;</button></li>
+          </ul>
+        </li>
+        <li class="card">
+          <div class="head">
+            <h3 class="t-display-3">Pricing legibility</h3>
+            <span class="t-code ku-num" style="color:var(--color-text-tertiary)">1 quote</span>
+          </div>
+          <p class="t-body-m" style="margin-top:16px;color:var(--color-text-secondary)">The per-seat line reads as a per-project charge.</p>
+          <ul class="rule stack">
+            <li>
+              <p class="t-italic-stat" style="border-left:2px solid var(--color-border-strong);padding-left:16px;color:var(--color-text-secondary)">&ldquo;I assumed it was nineteen a project, not a person&rdquo;</p>
+              <p class="t-code" style="margin-top:8px;padding-left:16px;color:var(--color-text-tertiary)">Couldn&rsquo;t locate this quote in the transcript.</p>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Transcript column -->
+    <section>
+      <div class="head">
+        <h2 class="t-eyebrow" style="color:var(--color-text-secondary)">Transcript</h2>
+        <div class="filter">
+          <button aria-pressed="true" class="t-eyebrow">All</button>
+          <button aria-pressed="false" class="t-eyebrow">Quoted only</button>
+        </div>
+      </div>
+      <p class="t-code ku-num" style="margin-top:16px;color:var(--color-text-tertiary)">3 quotes · 3 themes · 2 of 84 passages quoted</p>
+
+      <div class="card pane" style="margin-top:24px">
+        <p class="transcript-block t-body-m"><span data-start="0">Interviewer: Walk me through the first time you opened it.
+Participant: Sure. So I signed up on my phone, which was fine, and then </span><a class="evidence-mark" href="?q=0" data-start="120" data-end="170" data-focused="true">I got to the second screen and just gave up on it, and honestly I never went back to finish setting the thing up at all</a><span data-start="170">. It asked for a workspace name and I had no idea what that meant for me.</span></p>
+
+        <p class="transcript-block t-body-m" style="margin-top:16px"><button class="run">+142 words with no quote</button></p>
+
+        <p class="transcript-block t-body-m" style="margin-top:16px"><span data-start="400">Participant: Honestly </span><a class="evidence-mark" href="?q=1" data-start="422" data-end="466">nobody told me I needed a workspace first</a><span data-start="466">, and by then I had already invited two people who could not see anything.</span></p>
+
+        <div class="selcard" style="top:196px;left:24px">
+          <p class="t-body-m">No quote covers this passage.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <p class="t-eyebrow" style="color:var(--color-text-secondary)">Highlight states</p>
+        <div class="swatchrow">
+          <div class="swatch">
+            <p class="t-body-m"><a class="evidence-mark" href="?q=0">rest, accent-wash fill</a></p>
+            <p class="t-code ku-num" style="margin-top:8px;color:var(--color-text-tertiary)">9.67:1</p>
+          </div>
+          <div class="swatch">
+            <p class="t-body-m"><a class="evidence-mark" href="?q=0" style="background:var(--color-accent-tint)">hover, accent-tint fill</a></p>
+            <p class="t-code ku-num" style="margin-top:8px;color:var(--color-text-tertiary)">7.33:1</p>
+          </div>
+          <div class="swatch">
+            <p class="t-body-m"><a class="evidence-mark" href="?q=0" data-focused="true">focused, accent ring</a></p>
+            <p class="t-code ku-num" style="margin-top:8px;color:var(--color-text-tertiary)">5.61:1 on fill</p>
+          </div>
+          <div class="swatch">
+            <p class="t-body-m"><a class="evidence-mark" href="?q=0" style="outline:2px solid var(--color-accent);outline-offset:2px">keyboard focus</a></p>
+            <p class="t-code ku-num" style="margin-top:8px;color:var(--color-text-tertiary)">6.44:1 on paper</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>
