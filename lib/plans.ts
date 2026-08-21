@@ -24,3 +24,19 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
 };
 
 export const TRIAL_DAYS = Number(process.env.STRIPE_TRIAL_DAYS ?? 21);
+
+/**
+ * Interview slots left in a study on this plan.
+ *
+ * PLAN_LIMITS has carried maxInterviewsPerStudy since the v1 decisions and no
+ * route has ever enforced it. The CSV import route is where that stops being
+ * theoretical: without this, one import creates fifty interviews on a trial
+ * account capped at five, and every one of them costs an Anthropic call.
+ *
+ * Returns Infinity for unlimited plans so callers can compare directly.
+ */
+export function interviewSlotsRemaining(plan: Plan, currentCount: number): number {
+  const max = PLAN_LIMITS[plan]?.maxInterviewsPerStudy ?? 0;
+  if (max === -1) return Number.POSITIVE_INFINITY;
+  return Math.max(0, max - currentCount);
+}

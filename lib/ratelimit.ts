@@ -18,6 +18,12 @@ export const limits = {
   studyCreate:  new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5,  '1 h'),  prefix: 'rl:study' }),
   themeEdit:    new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(60, '1 m'),  prefix: 'rl:theme' }),
   auth:         new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, '1 m'),  prefix: 'rl:auth' }),
+  // CSV import gets its own bucket. One import request can create up to 50
+  // interviews and 50 Anthropic jobs, so sharing the upload allowance would let
+  // an import drain it, and would make a burst of imports look like ordinary
+  // upload traffic. Five an hour is abuse protection; the plan's
+  // interviews-per-study limit is what actually bounds the spend.
+  importCsv:    new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5,  '1 h'),  prefix: 'rl:import' }),
   // Synthesis is the most expensive call in the app (30-60s Anthropic run).
   synthesize:   new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(10, '1 h'),  prefix: 'rl:synth' }),
 } as const;

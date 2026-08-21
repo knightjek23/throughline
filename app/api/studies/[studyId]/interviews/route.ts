@@ -1,9 +1,17 @@
 /**
  * POST /api/studies/:studyId/interviews
  *
- * Accepts a multipart upload of an interview transcript, validates,
- * parses, stores the raw file in Supabase Storage, inserts an `interviews`
- * row with status `queued`, and enqueues an analysis job via QStash.
+ * Accepts one transcript, either as a multipart file or as pasted text,
+ * validates, parses, stores the raw source in Supabase Storage, inserts an
+ * `interviews` row with status `queued`, and enqueues an analysis job.
+ *
+ * Day 8 opens this to .vtt, .srt and .docx alongside .txt, and adds the paste
+ * path. CSV does not come down this route: a CSV holds many interviews and
+ * belongs to POST /api/studies/:studyId/import.
+ *
+ * Paste writes a real storage object rather than a special case. `storage_path`
+ * is `not null`, and more importantly the raw source staying the source of
+ * truth is what keeps re-analysis and export honest later.
  *
  * GET   — lists interviews for the study (used by the UI polling loop).
  */
@@ -13,7 +21,13 @@ import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { createServerClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { parseTranscript, SUPPORTED_MIMES, type SupportedMime } from '@/lib/parsers';
+import {
+  parseTranscript,
+  isImportType,
+  storageExtension,
+  SUPPORTED_MIMES,
+  type SupportedMime,
+} from '@/lib/parsers';
 import { enqueue } from '@/lib/qstash';
 import { check } from '@/lib/ratelimit';
 import {
@@ -30,16 +44,21 @@ export const dynamic = 'force-dynamic';
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 const BUCKET = 'transcripts';
 
-// Day 2: only text/plain. Day 2.5 extends with vtt/srt/docx.
-const ENABLED_MIMES: ReadonlySet<SupportedMime> = new Set(['text/plain']);
-
 interface RouteContext {
   params: Promise<{ studyId: string }>;
 }
 
 const uuidSchema = z.string().uuid();
+const pasteNameSchema = z.string().trim().min(1).max(120);
 
-// ---------- POST: upload + queue ---------------------------------------------
+/** Default name for a paste, so the row is addressable without forcing a field. */
+function defaultPasteName(): string {
+  const now = new Date();
+  const day = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return `Pasted transcript, ${day}`;
+}
+
+// ---------- POST: upload or paste, then queue --------------------------------
 
 export async function POST(req: Request, { params }: RouteContext) {
   const { userId } = await auth();
@@ -50,7 +69,8 @@ export async function POST(req: Request, { params }: RouteContext) {
     return jsonError('invalid study id', 400);
   }
 
-  // Rate limit: 10 uploads/hour per user (roadmap §4 security).
+  // Rate limit: 10 uploads/hour per user (roadmap §4 security). A paste costs a
+  // token too; it is the same downstream work.
   const rl = await check('upload', userId);
   if (!rl.success) {
     const retrySeconds = Math.max(0, Math.ceil((rl.reset - Date.now()) / 1000));
@@ -78,27 +98,60 @@ export async function POST(req: Request, { params }: RouteContext) {
   } catch {
     return jsonError('expected multipart/form-data body', 400);
   }
+
   const fileEntry = formData.get('file');
-  if (!(fileEntry instanceof File)) {
-    return jsonError('missing "file" field', 400);
-  }
-  const file = fileEntry;
+  const textEntry = formData.get('text');
 
-  // Size validation BEFORE reading the buffer.
-  if (file.size > MAX_BYTES) {
-    return jsonError(`file exceeds ${MAX_BYTES} bytes`, 413);
+  let buf: Buffer;
+  let mime: string;
+  let filename: string;
+
+  if (fileEntry instanceof File) {
+    const file = fileEntry;
+
+    // Size validation BEFORE reading the buffer.
+    if (file.size > MAX_BYTES) {
+      return jsonError(`file exceeds ${MAX_BYTES} bytes`, 413);
+    }
+
+    // A CSV is recognised, not rejected as unknown: the researcher gets sent to
+    // the right door rather than told their file is unsupported.
+    if (isImportType(file.type, file.name)) {
+      return jsonError(
+        'this looks like a CSV. Use import to bring in several interviews at once',
+        415,
+      );
+    }
+
+    if (!SUPPORTED_MIMES.has(file.type as SupportedMime) && !file.name.includes('.')) {
+      return jsonError(`unsupported file type: ${file.type || 'unknown'}`, 415);
+    }
+
+    buf = Buffer.from(await file.arrayBuffer());
+    mime = file.type;
+    filename = file.name;
+  } else if (typeof textEntry === 'string') {
+    if (textEntry.length > MAX_BYTES) {
+      return jsonError(`pasted text exceeds ${MAX_BYTES} bytes`, 413);
+    }
+
+    const nameEntry = formData.get('name');
+    const parsedName =
+      typeof nameEntry === 'string' ? pasteNameSchema.safeParse(nameEntry) : null;
+
+    buf = Buffer.from(textEntry, 'utf8');
+    mime = 'text/plain';
+    filename = parsedName?.success ? parsedName.data : defaultPasteName();
+  } else {
+    return jsonError('missing "file" or "text" field', 400);
   }
 
-  // MIME validation. Trust the header but defense-in-depth via the parser too.
-  if (!SUPPORTED_MIMES.has(file.type as SupportedMime) || !ENABLED_MIMES.has(file.type as SupportedMime)) {
-    return jsonError(`unsupported file type: ${file.type || 'unknown'}`, 415);
-  }
-
-  // Parse transcript.
-  const buf = Buffer.from(await file.arrayBuffer());
+  // Parse transcript. The parser is the final authority on type: content that
+  // does not parse as its claimed format is rejected here regardless of what
+  // the extension or the MIME header said.
   let parsed;
   try {
-    parsed = await parseTranscript(buf, file.type, file.name);
+    parsed = await parseTranscript(buf, mime, filename);
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'parse failed';
     return jsonError(`parser rejected file: ${msg}`, 400);
@@ -106,20 +159,19 @@ export async function POST(req: Request, { params }: RouteContext) {
 
   // Generate the interview id upfront so storage path and DB row match.
   const interviewId = randomUUID();
-  // v0 accepts only text/plain, so the stored extension is always txt.
-  // When vtt/srt/docx land, derive this from the validated MIME type
-  // (not the user-supplied filename).
-  const storagePath = `${userId}/${studyId}/${interviewId}.txt`;
+  // Derived from the validated format rather than the supplied filename, which
+  // is user input and does not belong in a storage path.
+  const extension = fileEntry instanceof File ? storageExtension(mime, filename) : 'txt';
+  const storagePath = `${userId}/${studyId}/${interviewId}.${extension}`;
 
-  // Upload raw file to Supabase Storage. Use admin client because the
-  // storage policies check `(storage.foldername(name))[1] = clerk_user_id()`;
-  // both clients would work, but admin sidesteps any JWT-not-yet-refreshed edge
-  // cases server-side. We've already verified ownership above.
+  // Upload raw source to Supabase Storage. Admin client because the storage
+  // policies check `(storage.foldername(name))[1] = clerk_user_id()`; ownership
+  // is already verified above.
   const admin = createAdminClient();
   const { error: uploadErr } = await admin.storage
     .from(BUCKET)
     .upload(storagePath, buf, {
-      contentType: file.type,
+      contentType: mime || 'text/plain',
       upsert: false,
     });
   if (uploadErr) {
@@ -134,7 +186,7 @@ export async function POST(req: Request, { params }: RouteContext) {
       id: interviewId,
       study_id: studyId,
       user_id: userId,
-      filename: file.name,
+      filename,
       storage_path: storagePath,
       transcript_text: parsed.text,
       word_count: parsed.wordCount,
